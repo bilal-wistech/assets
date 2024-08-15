@@ -278,7 +278,7 @@
   <div class="col-md-6">
     <div class="box">
       <div class="box-header with-border">
-        <h2 class="box-title">{{ trans('general.upcoming_expired_insurances') }}</h2>
+        <h2 class="box-title">Upcoming Expired Insurances</h2>
         <div class="box-tools pull-right">
             <button type="button" class="btn btn-box-tool" data-widget="collapse" aria-hidden="true">
                 <i class="fas fa-minus" aria-hidden="true"></i>
