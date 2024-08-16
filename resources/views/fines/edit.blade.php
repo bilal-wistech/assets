@@ -83,6 +83,7 @@
                                     <input type="datetime-local" id="fine_date" class="form-control"
                                         placeholder="Select Date and Time (YYYY-MM-DDTHH:MM:SS)" name="fine_date"
                                         value="{{ isset($fine) ? Carbon::parse($fine->fine_date)->format('Y-m-d\TH:i:s') : Carbon::now()->format('Y-m-d\TH:i:s') }}">
+                                        <span id="asset-error" class="text-danger mt-2" style="display:none;"></span>
                                 </div>
                             </div>
                             <!-- asset  -->
@@ -96,7 +97,7 @@
                             <div class="form-group" style="display: none;">
                                 <label for="user_id" class="col-md-3 control-label">{{ trans('general.users') }}</label>
                                 <div class="col-md-7">
-                                    {{ Form::select('user_id', isset($fine) ? [$fine->user->username] + $users : ['' => 'Select'] + $users, isset($fine) ? $fine->user->id : null, ['class' => 'form-control  select2', 'id' => 'user_id', 'required']) }}
+                                    {{ Form::select('user_id', isset($fine) ? [$fine->user->username] + $users : ['' => 'Select'] + $users, isset($fine) ? $fine->user->id : null, ['class' => 'form-control  select2', 'id' => 'user_id', 'required' ,'style' => 'width: 100%;']) }}
                                 </div>
                             </div>
 
@@ -217,7 +218,7 @@
                 if (dateSelected) {
                     sendAjaxRequest();
                 } else {
-                    alert('Please select a date first.');
+                    $('#asset-error').text('Please select a date and time first.').show();
                 }
             });
 
