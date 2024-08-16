@@ -59,7 +59,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('fine/{id}/edit', [FineController::class, 'edit'])->name('fines.edit');
     Route::post('fine/{id}/update', [FineController::class, 'update'])->name('fines.update');
     Route::match(['get', 'post'], 'fine/{id}/delete', [FineController::class, 'destroy'])->name('fines.del');
-
+    Route::get('/fetch-fines', [FineController::class, 'fetchFines'])->name('fetch-fines');
 
     Route::post(
         '{item_id}/upload',

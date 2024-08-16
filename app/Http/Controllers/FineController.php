@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Asset;
 use App\Models\Fine;
@@ -197,4 +197,29 @@ class FineController extends Controller
         $data->delete();
         return redirect()->route('fines')->with('success', 'data deleted successfully');
     }
+    public function fetchFines(Request $request)
+    {
+        $Date = $request->input('fine_date');
+        $assetId = $request->input('asset_id');
+        $fineDate = Carbon::parse($Date)->format('Y-m-d H:i:s');
+        $asset = Asset::where('last_checkout', $fineDate)
+                    ->where('id', $assetId)
+                    ->first();
+        if ($asset) {
+            $userId = $asset->user_id;
+            $user = User::where('id', $userId)
+                        ->select('id as user_id', 'username')
+                        ->first();
+            return response()->json([
+                'success' => true,
+                'message' => $user
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'There is no user for Selected datetime.'
+            ]);
+        }
+    }
+
 }
