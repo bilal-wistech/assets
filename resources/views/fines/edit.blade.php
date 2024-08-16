@@ -82,7 +82,7 @@
                                 <div class="col-md-7 date" style="display: table">
                                     <input type="datetime-local" id="fine_date" class="form-control"
                                         placeholder="Select Date and Time (YYYY-MM-DDTHH:MM:SS)" name="fine_date"
-                                        value="{{ isset($fine) ? Carbon::parse($fine->fine_date)->format('Y-m-d\TH:i:s') : Carbon::now()->format('Y-m-d\TH:i:s') }}">
+                                        value="{{ isset($fine) ? Carbon::parse($fine->created_at)->format('Y-m-d\TH:i:s') : Carbon::now()->format('Y-m-d\TH:i:s') }}">
                                         <span id="asset-error" class="text-danger mt-2" style="display:none;"></span>
                                 </div>
                             </div>
