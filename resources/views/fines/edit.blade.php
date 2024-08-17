@@ -226,6 +226,7 @@
             var assetSelected = false;
             $('#fine_date').on('change', function() {
                 dateSelected = true;
+                $('#asset-error').hide();
                 if (assetSelected) {
                     sendAjaxRequest();
                 }
