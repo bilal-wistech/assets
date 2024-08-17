@@ -740,13 +740,36 @@
                                 </a>
                             </li>
                         @endcanany
-                        @canany(['admin','view'], \App\Models\Fine::class)
+                        @can('incident.view')
+                            <li class="treeview{{ (Request::is('fines*') ? ' active' : '') }}">
+                                <a href="#" class="dropdown-toggle">
+                                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    <span>{{ trans('Incident') }}</span>
+                                    <i class="fa fa-angle-left pull-right"></i>
+                                </a>
+
+                                <ul class="treeview-menu">
+                                    <li>
+                                        <a href="javascript:;" {!! Request::is('reports.audit') ? ' class="active"' : '' !!}>
+                                            <i class="fa fa-car-crash"></i>&nbsp;<span>{{ trans('Accidents') }}</span>
+                                        </a>
+                                        
+                                    </li>
+                                    <li {!! (Request::is('fines*') ? ' class="active"' : '') !!} class="firstnav">
+                                        <a href="{{ route('fines')}}">
+                                            <i class="fa-solid fa-file-invoice"></i>&nbsp;&nbsp;<span>{{ trans('general.fines') }}</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endcan
+                        {{-- @canany(['admin','view'], \App\Models\Fine::class)
                             <li {!! (Request::is('fines*') ? ' class="active"' : '') !!} class="firstnav">
                                 <a href="{{ route('fines')}}">
                                     <i class="fa-solid fa-file-invoice"></i>&nbsp;<span>{{ trans('general.fines') }}</span>
                                 </a>
                             </li>
-                        @endcanany
+                        @endcanany --}}
                         @can('backend.interact')
                             <li class="treeview {!! in_array(Request::route()->getName(),App\Helpers\Helper::SettingUrls()) ? ' active': '' !!}">
                                 <a href="#" id="settings">
