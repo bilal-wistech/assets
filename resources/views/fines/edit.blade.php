@@ -80,12 +80,26 @@
                             <div class="form-group">
                                 {{ Form::label('fine_date', trans('general.fine_date'), ['class' => 'col-md-3 control-label']) }}
                                 <div class="col-md-7 date" style="display: table">
+                                    <!-- Date and Time Input -->
                                     <input type="datetime-local" id="fine_date" class="form-control"
-                                        placeholder="Select Date and Time (YYYY-MM-DDTHH:MM:SS)" name="fine_date"
-                                        value="{{ isset($fine) ? Carbon::parse($fine->fine_date)->format('Y-m-d\TH:i:s') : Carbon::now()->format('Y-m-d\TH:i:s') }}">
-                                        <span id="asset-error" class="text-danger mt-2" style="display:none;"></span>
+                                        placeholder="Select Date and Time (YYYY-MM-DD HH:MM)" name="fine_date"
+                                        value="{{ isset($fine) ? Carbon::parse($fine->created_at)->format('Y-m-d\TH:i') : Carbon::now()->format('Y-m-d\TH:i') }}">
+
+                                    <!-- Seconds Dropdown -->
+                                    <select id="fine_seconds" class="form-control mt-2" name="fine_seconds">
+                                        @for ($i = 0; $i < 60; $i++)
+                                            <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}"
+                                                {{ isset($fine) && Carbon::parse($fine->created_at)->format('s') == str_pad($i, 2, '0', STR_PAD_LEFT) ? 'selected' : '' }}>
+                                                {{ str_pad($i, 2, '0', STR_PAD_LEFT) }}
+                                            </option>
+                                        @endfor
+                                    </select>
+
+                                    <span id="asset-error" class="text-danger mt-2" style="display:none;"></span>
                                 </div>
                             </div>
+
+
                             <!-- asset  -->
                             <div class="form-group">
                                 <label for="asset_id" class="col-md-3 control-label">{{ trans('general.asset_id') }}</label>
@@ -97,12 +111,13 @@
                             <div class="form-group" style="display: none;">
                                 <label for="user_id" class="col-md-3 control-label">{{ trans('general.users') }}</label>
                                 <div class="col-md-7">
-                                    {{ Form::select('user_id', isset($fine) ? [$fine->user->username] + $users : ['' => 'Select'] + $users, isset($fine) ? $fine->user->id : null, ['class' => 'form-control  select2', 'id' => 'user_id', 'required' ,'style' => 'width: 100%;']) }}
+                                    {{ Form::select('user_id', isset($fine) ? [$fine->user->username] + $users : ['' => 'Select'] + $users, isset($fine) ? $fine->user->id : null, ['class' => 'form-control  select2', 'id' => 'user_id', 'required', 'style' => 'width: 100%;']) }}
                                 </div>
                             </div>
 
                             <!-- Fine Number -->
-                            <div style="display: none;" class="form-group {{ $errors->has('fine_number') ? 'error' : '' }}">
+                            <div style="display: none;"
+                                class="form-group {{ $errors->has('fine_number') ? 'error' : '' }}">
                                 {{ Form::label('fine_number', 'Fine Number', ['class' => 'col-md-3 control-label']) }}
                                 <div class="col-md-7">
                                     <input class="form-control" type="text" name="fine_number" id="fine_number"
@@ -141,12 +156,14 @@
                                 {{ Form::label('amount', trans('general.amount'), ['class' => 'col-md-3 control-label']) }}
                                 <div class="col-md-7">
                                     <input class="form-control" type="number" name="amount" id="amount"
-                                        value="{{ isset($fine) ? $fine->amount : '' }}" step="0.01" />
+                                        value="{{ isset($fine) ? $fine->amount : '0'}}" readonly />
                                     {!! $errors->first(
                                         'amount',
                                         '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>',
                                     ) !!}
+
                                 </div>
+                                <span id="amount-error" class="text-danger mt-2" style="display:none;">No amount found</span>
                             </div>
 
 
@@ -177,7 +194,7 @@
                                     {!! $errors->first(
                                         'note',
                                         '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times"
-                                                                                                                                                                                    aria-hidden="true"></i> :message</span>',
+                                                                                                                                                                                                                                                                                                aria-hidden="true"></i> :message</span>',
                                     ) !!}
                                 </div>
                             </div>
@@ -203,8 +220,8 @@
 
     <script>
         $(document).ready(function() {
-            var username = ''; 
-            var userId = ''; 
+            var username = '';
+            var userId = '';
             var dateSelected = false;
             var assetSelected = false;
             $('#fine_date').on('change', function() {
@@ -224,23 +241,39 @@
 
             function sendAjaxRequest() {
                 var selectedDate = $('#fine_date').val();
+                var selectedSeconds = $('#fine_seconds').val();
+                var formattedDateTime = selectedDate + ':' + selectedSeconds;
+                //alert(formattedDateTime);
+                //return false;
                 var selectedAssetId = $('#asset_id').val();
                 $.ajax({
                     url: '{{ route('fetch-fines') }}',
                     type: 'GET',
                     data: {
-                        fine_date: selectedDate,
+                        fine_date: formattedDateTime,
                         asset_id: selectedAssetId
                     },
                     success: function(response) {
                         console.log(response.message);
                         if (response.message === 'There is no user for Selected datetime.') {
                             $('#Usermodal').modal('show');
+                            var $select = $('#user_id');
+                            $select.empty();
+                            $select.append($('<option>', {
+                                value: '',
+                                text: 'Select a user'
+                            }));
+                            $.each(response.users, function(id, username) {
+                                $select.append($('<option>', {
+                                    value: id,
+                                    text: username
+                                }));
+                            });
                         } else {
-                             username = response.message.username || 'Unknown User';
-                             userId = response.message.id || 'Unknown ID';
+                            username = response.message.username || 'Unknown User';
+                            userId = response.message.id || 'Unknown ID';
                             var text = username +
-                                ' the selected asset is  with following Driver at the selected date and time. ';
+                                ' is the assigned driver for the selected asset on the chosen date and time.';
                             $('#myselecteduser').text(text);
                             $('#SelecteduserModal').modal('show');
 
@@ -265,13 +298,38 @@
             });
             $('#SelecteduserModal').on('click', '#goWithSelectedUser', function() {
                 $('#SelecteduserModal').modal('hide');
-                $('#user_id').empty(); 
-                $('#user_id').append(new Option(username, userId)); 
+                $('#user_id').empty();
+                $('#user_id').append(new Option(username, userId));
                 $('#fine_number, #fine_type, #amount, #location, #fine_image, #note, #user_id').closest(
                     '.form-group').css('display', 'block');
                 $('.col-md-1.col-sm-1.text-left').css('display', 'block');
             });
         });
+        // fine type code
+        $('#fine_type').change(function() {
+            var fineTypeId = $(this).val();
+            $.ajax({
+            url: '/get-fine-type-amount', 
+            type: 'GET',
+            data: { fine_type_id: fineTypeId },
+            success: function(response) {
+                if (response.amount !== undefined) {
+                    $('#amount').val(response.amount); 
+                    $('#amount-error').hide(); 
+                } else {
+                    $('#amount').val(0); 
+                    $('#amount-error').show();
+                }
+            },
+            error: function() {
+                $('#amount').val(0); 
+                $('#amount-error').text('Error occurred while fetching the amount').show(); 
+            }
+        });
+
+        });
+
+        //end of fine type code
         $('.select2').select2();
     </script>
 @stop

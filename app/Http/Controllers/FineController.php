@@ -144,6 +144,7 @@ class FineController extends Controller
      */
     public function edit($id)
     {
+        
         $this->authorize('update', Fine::class);
         $fine =  Fine::find($id);
         $assets = Asset::all()->map(function ($asset) {
@@ -164,7 +165,8 @@ class FineController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // dd($request->all());
+     
+         //dd($request->all());
         // $model = Fine::find($id);
         $user = Fine::find($id);
 
@@ -172,6 +174,7 @@ class FineController extends Controller
         if ($user) {
 
             $user->fine_type = $request->fine_type;
+            $user->fine_number=$request->fine_number;
             $user->amount = $request->amount;
             $user->user_id = $request->user_id;
             $user->asset_id = $request->asset_id;
@@ -197,6 +200,17 @@ class FineController extends Controller
         $data->delete();
         return redirect()->route('fines')->with('success', 'data deleted successfully');
     }
+    public function getFineTypeAmount(Request $request)
+{
+    $fineTypeId = $request->fine_type_id;
+    $fineType = FineType::find($fineTypeId);
+    if ($fineType) {
+        return response()->json(['amount' => $fineType->amount]);
+    } else {
+        return response()->json(['amount' => null]);
+    }
+}
+
     public function fetchFines(Request $request)
     {
         $Date = $request->input('fine_date');
@@ -208,16 +222,19 @@ class FineController extends Controller
         if ($asset) {
             $userId = $asset->user_id;
             $user = User::where('id', $userId)
-                        ->select('id as user_id', 'username')
+                        ->select('id', 'username')
                         ->first();
             return response()->json([
                 'success' => true,
                 'message' => $user
             ]);
         } else {
+            $users = User::all()->pluck('username', 'id')->toArray();
             return response()->json([
+               
                 'success' => false,
-                'message' => 'There is no user for Selected datetime.'
+                'message' => 'There is no user for Selected datetime.',
+                'users' => $users
             ]);
         }
     }

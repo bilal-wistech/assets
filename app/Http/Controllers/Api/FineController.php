@@ -53,8 +53,13 @@ class FineController extends Controller
       if (!$request->filled('name')) {
          return response()->json(Helper::formatStandardApiResponse('error', null, ['Name' => ['Name is required.']]));
       }
+      // Validate 'amount' field
+    if (!$request->filled('amount')) {
+      return response()->json(Helper::formatStandardApiResponse('error', null, ['Amount' => ['Amount is required.']]));
+  }
       $type = new FineType;
       $type->name = $request->name;
+      $type->amount = $request->amount;
       if ($type->save()) {
          return response()->json(Helper::formatStandardApiResponse('success', $type, 'New Fine Type is Saved Successfully.'));
       }
