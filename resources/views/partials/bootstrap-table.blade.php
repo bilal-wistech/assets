@@ -259,10 +259,8 @@
             return function(value, row) {
 
                 var actions = '<nobr>';
-
                 // Add some overrides for any funny urls we have
                 var dest = owner_name;
-
                 if (dest == 'groups') {
                     var dest = 'admin/groups';
                 }
@@ -311,7 +309,17 @@
            '<i class="fas fa-trash" aria-hidden="true"></i><span class="sr-only">{{ trans('general.delete') }}</span></a>&nbsp;';
 
 
-                    } else if (dest == 'users') {
+                    }
+                    else if (dest == 'accident') {
+
+actions += '<a href="' + '{{ route('accidents.del', ['id' => 'REPLACE_ID']) }}'.replace('REPLACE_ID', row.id) + '" ' +
+' class="actions btn btn-danger btn-sm" data-tooltip="true" ' +
+' data-title="{{ trans('general.delete') }}" onClick="return confirm(\'Are you sure?\');">' +
+'<i class="fas fa-trash" aria-hidden="true"></i><span class="sr-only">{{ trans('general.delete') }}</span></a>&nbsp;';
+
+
+}
+                     else if (dest == 'users') {
                         name_for_box = 'users';
                         actions += '<a href="https://asset.wistech.biz/' + dest + '/' + row.id + '/delete" ' +
                             ' class="actions btn btn-danger btn-sm" data-tooltip="true"  ' +
@@ -537,6 +545,7 @@
             'kits',
             'insurance',
             'fine',
+            'accident',
             'assetassignment',
             'expensetype',
             'tsrepairoptions',

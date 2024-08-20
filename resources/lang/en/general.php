@@ -37,6 +37,7 @@ return [
     'from' => 'From',
       'fines' => 'Fines',
     'add_fine' => 'Add Fine',
+    'add_accident' => 'Add Accident',
     'fine_type' => 'Fine Type',
     'fine_date' => 'Fine Date',
     'assigned_at'=>'Assigned At',
@@ -46,6 +47,7 @@ return [
     'handover_to_company'  => 'Handover to Company',  
     'expiry_date'  => 'Expiry Date',
     'documents'  => 'Documents',
+
     
     
     

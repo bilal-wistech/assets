@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AccidentController;
+
 
 // use Illuminate\Http\Request;
 
@@ -550,6 +552,16 @@ Route::group(['prefix' => 'v1', 'middleware' => ['api', 'throttle:api']], functi
             'index'
         ]
     )->name('api.fine.index');
+
+    //accidents
+
+    Route::get(
+        '/accidents',
+        [
+            Api\AccidentController::class,
+            'index'
+        ]
+    )->name('api.accident.index');
 
 
     /**
@@ -1502,3 +1514,4 @@ Route::group(['prefix' => 'v1', 'middleware' => ['api', 'throttle:api']], functi
     Route::post('/vendor_create',
         [Api\SuppliersController::class, 'vendor_create'])->name('api.vendor.create')->middleware('auth:api');
 }); // end API routes
+Route::post('/accident-type', [AccidentController::class, 'accidentType'])->name('api.accident_type');

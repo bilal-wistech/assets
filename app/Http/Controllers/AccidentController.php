@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Asset;
-use App\Models\Fine;
+use App\Models\Accident;
 use App\Models\Location;
 use App\Models\FineType;
+use App\Models\AccidentType;
 use App\Models\User;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\SendPushNotification;
@@ -16,17 +17,19 @@ use App\Models\ExpoToken;
 use ExpoSDK\ExpoMessage;
 use Image;
 
-class FineController extends Controller
+
+class AccidentController extends Controller
 {
-    /**
+     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        $this->authorize('view', Fine::class);
-        return view('fines.index');
+        
+        $this->authorize('view', Accident::class);
+        return view('accidents.index');
     }
 
     /**
@@ -36,13 +39,14 @@ class FineController extends Controller
      */
     public function create()
     {
-        $this->authorize('create', Fine::class);
+        
+        $this->authorize('create', Accident::class);
         $assets = Asset::all()->pluck('asset_tag', 'id')->toArray();
         $users = User::all()->pluck('username', 'id')->toArray();
-        $fine_type = FineType::all()->pluck('name', 'id')->toArray();
+        $fine_type = AccidentType::all()->pluck('name', 'id')->toArray();
         $location = Location::all()->pluck('name', 'id')->toArray();
         // dd($assets);
-        return view('fines.edit', compact('assets', 'fine_type', 'location', 'users'));
+        return view('accidents.edit', compact('assets', 'fine_type', 'location', 'users'));
     }
 
     /**
@@ -53,11 +57,11 @@ class FineController extends Controller
      */
     public function store(Request $request)
     {
-
         $data = $request->all();
+        //dd($data);
         // dd($request->fine_type->fine);
-        if ($request->file('fine_image')) {
-            $image = $request->file('fine_image');
+        if ($request->file('accident_image')) {
+            $image = $request->file('accident_image');
             //  dd($image);
             $imageName = time() . '.' . $image->getClientOriginalExtension();
 
@@ -66,17 +70,18 @@ class FineController extends Controller
 
             $image_resize->resize(1000, 1000);
             // dd($image_resize);
-            $path = 'uploads/fines/' . $imageName;
+            $path = 'uploads/accidents/' . $imageName;
 
             $image_resize->save($path);
 
-            $imageUri = 'uploads/fines/' . $imageName;
+            $imageUri = 'uploads/accidents/' . $imageName;
 
-            $data['fine_image'] = $path;
+            $data['accident_image'] = $path;
         }
 
-        $fine = Fine::create($data);
-        $detail = Fine::latest()->first();
+         $fine = Accident::create($data);
+        $detail = Accident::latest()->first();
+        
         //   dd($detail->user_id);
 
         $type_name = $detail->type && $detail->type->name != null ? $detail->type->name : 'not available';
@@ -98,13 +103,13 @@ class FineController extends Controller
                 //   dd($token);
                 $messages =
                     new ExpoMessage([
-                        'title' => 'Fine notification',
-                        'body' => 'You have got a Fine',
+                        'title' => 'Accident notification',
+                        'body' => 'An accident has been reported.',
                         'data' => [
                             'user_id' => $user_name,
                             'amount' => $request->amount,
-                            'fine_date' => $request->fine_date,
-                            'fine_type' => $type_name,
+                            'accident_date' => $request->accident_date,
+                            'accident_type' => $type_name,
                             'asset_id' => $asset_name,
                             'location' => $location_name,
                             'note' => $request->note,
@@ -117,7 +122,7 @@ class FineController extends Controller
                 (new Expo)->send($messages)->to($token)->push();
             }
 
-            return redirect()->route('fines')->with('success', 'Fine created successfully!');
+            return redirect()->route('accidents')->with('success', 'Accident created successfully!');
         } catch (\Exception $e) {
             report($e);
             return redirect()->back()->with('error', 'Something goes wrong while sending notification.');
@@ -132,7 +137,7 @@ class FineController extends Controller
      */
     public function show($id)
     {
-        $data = Fine::find($id);
+        $data = Accident::find($id);
         dd($data->type->name);
     }
 
@@ -144,16 +149,15 @@ class FineController extends Controller
      */
     public function edit($id)
     {
-
-        $this->authorize('update', Fine::class);
-        $fine = Fine::find($id);
+        $this->authorize('update', Accident::class);
+        $fine = Accident::find($id);
         $assets = Asset::all()->map(function ($asset) {
             return $asset->name . ' ' . $asset->asset_tag;
         })->toArray();
         $users = User::all()->pluck('username', 'id')->toArray();
-        $fine_type = FineType::all()->pluck('name', 'id')->toArray();
+        $fine_type = AccidentType::all()->pluck('name', 'id')->toArray();
         $location = Location::all()->pluck('name', 'id')->toArray();
-        return view('fines.edit', compact('fine', 'assets', 'users', 'fine_type', 'location'));
+        return view('accidents.edit', compact('fine', 'assets', 'users', 'fine_type', 'location'));
     }
 
     /**
@@ -168,22 +172,22 @@ class FineController extends Controller
 
         //dd($request->all());
         // $model = Fine::find($id);
-        $user = Fine::find($id);
+        $user = Accident::find($id);
 
         // Check if the user exists
         if ($user) {
 
-            $user->fine_type = $request->fine_type;
-            $user->fine_number = $request->fine_number;
+            $user->accident_type = $request->accident_type;
+            $user->accident_number = $request->accident_number;
             $user->amount = $request->amount;
             $user->user_id = $request->user_id;
             $user->asset_id = $request->asset_id;
             $user->location = $request->location;
-            $user->fine_date = $request->fine_date;
+            $user->accident_date = $request->accident_date;
             $user->recieved_by_user = $request->recieved_by_user;
             $user->note = $request->note;
             $user->save();
-            return redirect()->route('fines')->with('success', 'data updated successfully');
+            return redirect()->route('accidents')->with('success', 'data updated successfully');
         }
         ;
     }
@@ -196,15 +200,16 @@ class FineController extends Controller
      */
     public function destroy($id)
     {
-        $this->authorize('delete', Fine::class);
-        $data = Fine::find($id);
+       
+        $this->authorize('delete', Accident::class);
+        $data = Accident::find($id);
         $data->delete();
-        return redirect()->route('fines')->with('success', 'data deleted successfully');
+        return redirect()->route('accidents')->with('success', 'data deleted successfully');
     }
     public function getFineTypeAmount(Request $request)
     {
         $fineTypeId = $request->fine_type_id;
-        $fineType = FineType::find($fineTypeId);
+        $fineType = AccidentType::find($fineTypeId);
         if ($fineType) {
             return response()->json(['amount' => $fineType->amount]);
         } else {
@@ -212,9 +217,9 @@ class FineController extends Controller
         }
     }
 
-    public function fetchFines(Request $request)
+    public function fetchAccidents(Request $request)
     {
-        $Date = $request->input('fine_date');
+        $Date = $request->input('accident_date');
         $assetId = $request->input('asset_id');
         $fineDate = Carbon::parse($Date)->format('Y-m-d H:i:s');
         $asset = Asset::where('last_checkout', $fineDate)
@@ -239,5 +244,4 @@ class FineController extends Controller
             ]);
         }
     }
-
 }
