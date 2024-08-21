@@ -318,7 +318,7 @@
                                         {!! $errors->first(
                                             'note',
                                             '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times"
-                                                                                                                                                                                                                                                                                                                                                                            aria-hidden="true"></i> :message</span>',
+                                                                                                                                                                                                                                                                                                                                                                                                                    aria-hidden="true"></i> :message</span>',
                                         ) !!}
                                     </div>
                                 </div>
@@ -330,7 +330,7 @@
                                         {!! $errors->first(
                                             'note',
                                             '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times"
-                                                                                                                                                                                                                                                                                                                                                                            aria-hidden="true"></i> :message</span>',
+                                                                                                                                                                                                                                                                                                                                                                                                                    aria-hidden="true"></i> :message</span>',
                                         ) !!}
                                     </div>
                                 </div>
@@ -490,11 +490,11 @@
                     if (response.status === 'success') {
                         //alert('Data saved successfully!');
                         var newOption = new Option(response.data.name, response.data.id, true, true);
-                $('#fine_type').append(newOption).trigger('change');
+                        $('#fine_type').append(newOption).trigger('change');
 
-                // Clear the modal fields
-                $('#modal-name').val('');
-                $('#modal-amount').val('');
+                        // Clear the modal fields
+                        $('#modal-name').val('');
+                        $('#modal-amount').val('');
                         $('#accidentModal').modal('hide');
                     } else {
                         $('#modal_error_msg').text(response.message).show();
