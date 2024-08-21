@@ -15,6 +15,7 @@ use App\Http\Controllers\DepartmentsController;
 use App\Http\Controllers\DepreciationsController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\FineController;
+use App\Http\Controllers\AccidentController;
 use App\Http\Controllers\GroupsController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\ImportsController;
@@ -61,6 +62,17 @@ Route::group(['middleware' => 'auth'], function () {
     Route::match(['get', 'post'], 'fine/{id}/delete', [FineController::class, 'destroy'])->name('fines.del');
     Route::get('/fetch-fines', [FineController::class, 'fetchFines'])->name('fetch-fines');
     Route::get('/get-fine-type-amount', [FineController::class, 'getFineTypeAmount'])->name('fine_type.amount');
+
+    // accident
+    Route::get('/accidents', [AccidentController::class, 'index'])->name('accidents');
+    Route::get('/create-accident', [AccidentController::class, 'create'])->name('accidents.create');
+    Route::post('/store-accident', [AccidentController::class, 'store'])->name('accidents.store');
+    // Route::get('/show/{id}', [AccidentController::class, 'show'])->name('fines.show');
+    Route::get('accident/{id}/edit', [AccidentController::class, 'edit'])->name('accidents.edit');
+    Route::post('fine/{id}/update', [AccidentController::class, 'update'])->name('accidents.update');
+    Route::match(['get', 'post'], 'accident/{id}/delete', [AccidentController::class, 'destroy'])->name('accidents.del');
+    Route::get('/fetch-accidents', [AccidentController::class, 'fetchAccidents'])->name('fetch-accidents');
+    Route::get('/get-accident-type-amount', [AccidentController::class, 'getFineTypeAmount']);
 
 
     Route::post(

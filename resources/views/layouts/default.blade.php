@@ -741,7 +741,7 @@
                             </li>
                         @endcanany
                         @can('incident.view')
-                            <li class="treeview{{ (Request::is('fines*') ? ' active' : '') }}">
+                            <li class="treeview{{ (Request::is('fines*') || Request::is('accidents*') ? ' active' : '') }}">
                                 <a href="#" class="dropdown-toggle">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span>{{ trans('Incident') }}</span>
@@ -749,11 +749,10 @@
                                 </a>
 
                                 <ul class="treeview-menu">
-                                    <li>
-                                        <a href="javascript:;" {!! Request::is('reports.audit') ? ' class="active"' : '' !!}>
-                                            <i class="fa fa-car-crash"></i>&nbsp;<span>{{ trans('Accidents') }}</span>
+                                    <li {!! (Request::is('accidents*') ? ' class="active"' : '') !!} class="firstnav">
+                                        <a href="{{ route('accidents')}}">
+                                            <i class="fa fa-car-crash"></i>&nbsp;&nbsp;<span>{{ trans('Accidents') }}</span>
                                         </a>
-                                        
                                     </li>
                                     <li {!! (Request::is('fines*') ? ' class="active"' : '') !!} class="firstnav">
                                         <a href="{{ route('fines')}}">
