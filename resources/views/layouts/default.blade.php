@@ -741,7 +741,7 @@
                             </li>
                         @endcanany
                         @can('incident.view')
-                            <li class="treeview{{ (Request::is('fines*') || Request::is('accidents*') ? ' active' : '') }}">
+                            <li class="treeview{{ (Request::is('fines*') || Request::is('create*') || Request::is('accidents*') || Request::is('create-accident*') || Request::is('accident/*/edit') || Request::is('fine/*/edit') ? ' active' : '') }}">
                                 <a href="#" class="dropdown-toggle">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                                     <span>{{ trans('Incident') }}</span>
@@ -749,12 +749,12 @@
                                 </a>
 
                                 <ul class="treeview-menu">
-                                    <li {!! (Request::is('accidents*') ? ' class="active"' : '') !!} class="firstnav">
+                                    <li {!! (Request::is('accidents*') || Request::is('create-accident*') || Request::is('accident/*/edit') ? ' class="active"' : '') !!} class="firstnav">
                                         <a href="{{ route('accidents')}}">
                                             <i class="fa fa-car-crash"></i>&nbsp;&nbsp;<span>{{ trans('Accidents') }}</span>
                                         </a>
                                     </li>
-                                    <li {!! (Request::is('fines*') ? ' class="active"' : '') !!} class="firstnav">
+                                    <li {!! (Request::is('fines*') || Request::is('create') || Request::is('fine/*/edit')? ' class="active"' : '') !!} class="firstnav">
                                         <a href="{{ route('fines')}}">
                                             <i class="fa-solid fa-file-invoice"></i>&nbsp;&nbsp;<span>{{ trans('general.fines') }}</span>
                                         </a>
