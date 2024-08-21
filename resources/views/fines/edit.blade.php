@@ -456,11 +456,12 @@
                 success: function(response) {
                     if (response.status === 'success') {
                         //alert('Data saved successfully!');
-                        $('#fine_type').append('<option value="' + response.data.id + '">' + response
-                            .data.name + '</option>');
+                        var newOption = new Option(response.data.name, response.data.id, true, true);
+                $('#fine_type').append(newOption).trigger('change');
 
-                        $('#modal-name').val('');
-                        $('#modal-amount').val('');
+                // Clear the modal fields
+                $('#modal-name').val('');
+                $('#modal-amount').val('');
                         $('#accidentModal').modal('hide');
                     } else {
                         $('#modal_error_msg').text(response.message).show();
