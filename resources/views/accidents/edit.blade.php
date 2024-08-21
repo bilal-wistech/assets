@@ -114,14 +114,15 @@
                             <!-- Date/Time -->
                             <div class="form-group">
                                 {{ Form::label('accident_date', 'Accident Date', ['class' => 'col-md-3 control-label']) }}
-                                <div class="col-md-7 date" style="display: flex; align-items: center; flex-direction: column;">
+                                <div class="col-md-7 date"
+                                    style="display: flex; align-items: center; flex-direction: column;">
                                     <div style="width: 100%; display: flex; align-items: center;">
                                         <!-- Date and Time Input -->
                                         <input type="datetime-local" id="accident_date" class="form-control"
                                             style="width: 83%;" placeholder="Select Date and Time (YYYY-MM-DD HH:MM)"
                                             name="accident_date"
                                             value="{{ isset($fine) ? Carbon::parse($fine->created_at)->format('Y-m-d\TH:i') : Carbon::now()->format('Y-m-d\TH:i') }}">
-                            
+
                                         <!-- Seconds Dropdown -->
                                         <select id="fine_seconds" class="form-control" name="fine_seconds"
                                             style="width: 17%;">
@@ -133,12 +134,13 @@
                                             @endfor
                                         </select>
                                     </div>
-                            
+
                                     <!-- Error Message -->
-                                    <span id="asset-error" class="text-danger mt-3" style="display:none; align-self: flex-start;"></span>
+                                    <span id="asset-error" class="text-danger mt-3"
+                                        style="display:none; align-self: flex-start;"></span>
                                 </div>
                             </div>
-                            
+
 
 
 
@@ -151,96 +153,188 @@
                                 </div>
                             </div>
                             <!-- Users -->
-                            <div class="form-group" style="display: none;">
-                                <label for="user_id" class="col-md-3 control-label">{{ trans('general.users') }}</label>
-                                <div class="col-md-7">
-                                    {{ Form::select('user_id', isset($fine) ? [$fine->user->username] + $users : ['' => 'Select'] + $users, isset($fine) ? $fine->user->id : null, ['class' => 'form-control  select2', 'id' => 'user_id', 'required', 'style' => 'width: 100%;']) }}
+                            @if (Request::is('create-accident*'))
+                                <div class="form-group" style="display: none;">
+                                    <label for="user_id"
+                                        class="col-md-3 control-label">{{ trans('general.users') }}</label>
+                                    <div class="col-md-7">
+                                        {{ Form::select('user_id', isset($fine) ? [$fine->user->username] + $users : ['' => 'Select'] + $users, isset($fine) ? $fine->user->id : null, ['class' => 'form-control  select2', 'id' => 'user_id', 'required', 'style' => 'width: 100%;']) }}
+                                    </div>
                                 </div>
-                            </div>
-
-                            <!-- Fine Number -->
-                            <div style="display: none;"
-                                class="form-group {{ $errors->has('fine_number') ? 'error' : '' }}">
-                                {{ Form::label('fine_number', 'Accident Number', ['class' => 'col-md-3 control-label']) }}
-                                <div class="col-md-7">
-                                    <input class="form-control" type="text" name="accident_number" id="fine_number"
-                                        value="{{ isset($fine) ? $fine->fine_number : '' }}" />
-                                    {!! $errors->first(
-                                        'fine_number',
-                                        '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>',
-                                    ) !!}
+                            @else
+                                <div class="form-group">
+                                    <label for="user_id"
+                                        class="col-md-3 control-label">{{ trans('general.users') }}</label>
+                                    <div class="col-md-7">
+                                        {{ Form::select('user_id', isset($fine) ? [$fine->user->username] + $users : ['' => 'Select'] + $users, isset($fine) ? $fine->user->id : null, ['class' => 'form-control  select2', 'id' => 'user_id', 'required', 'style' => 'width: 100%;']) }}
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
+                            @if (Request::is('create-accident*'))
+                                <!-- Fine Number -->
+                                <div style="display: none;"
+                                    class="form-group {{ $errors->has('fine_number') ? 'error' : '' }}">
+                                    {{ Form::label('fine_number', 'Accident Number', ['class' => 'col-md-3 control-label']) }}
+                                    <div class="col-md-7">
+                                        <input class="form-control" type="text" name="accident_number"
+                                            id="fine_number" value="{{ isset($fine) ? $fine->fine_number : '' }}" />
+                                        {!! $errors->first(
+                                            'fine_number',
+                                            '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>',
+                                        ) !!}
+                                    </div>
+                                </div>
+                            @else
+                                <div class="form-group {{ $errors->has('fine_number') ? 'error' : '' }}">
+                                    {{ Form::label('fine_number', 'Accident Number', ['class' => 'col-md-3 control-label']) }}
+                                    <div class="col-md-7">
+                                        <input class="form-control" type="text" name="accident_number"
+                                            id="fine_number" value="{{ isset($fine) ? $fine->fine_number : '' }}" />
+                                        {!! $errors->first(
+                                            'fine_number',
+                                            '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>',
+                                        ) !!}
+                                    </div>
+                                </div>
+                            @endif
 
                             <!-- fine type -->
-
-                            <div style="display: none;" class="form-group">
-                                <label for="fine_type" class="col-md-3 control-label">Accident Type</label>
-                                <div class="col-md-7 required">
-                                    {{ Form::select('accident_type', isset($fine) ? [$fine->type->name] + $fine_type : ['' => 'Select'] + $fine_type, isset($fine) ? $fine->type->id : null, ['class' => 'form-control', 'id' => 'fine_type', 'required']) }}
-                                    {!! $errors->first(
-                                        'accident_type',
-                                        '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>',
-                                    ) !!}
+                            @if (Request::is('create-accident*'))
+                                <div style="display: none;" class="form-group">
+                                    <label for="fine_type" class="col-md-3 control-label">Accident Type</label>
+                                    <div class="col-md-7 required">
+                                        {{ Form::select('accident_type', isset($fine) ? [$fine->type->name] + $fine_type : ['' => 'Select'] + $fine_type, isset($fine) ? $fine->type->id : null, ['class' => 'form-control', 'id' => 'fine_type', 'required']) }}
+                                        {!! $errors->first(
+                                            'accident_type',
+                                            '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>',
+                                        ) !!}
+                                    </div>
+                                    <div style="display: none;" class="col-md-1 col-sm-1 text-left">
+                                        <button type="button" id="accidentmodel" class="btn btn-primary"
+                                            data-toggle="modal" data-target="#accidentModal">
+                                            New
+                                        </button>
+                                    </div>
                                 </div>
-                                <div style="display: none;" class="col-md-1 col-sm-1 text-left">
-                                    <button type="button" id="accidentmodel" class="btn btn-primary"
-                                        data-toggle="modal" data-target="#accidentModal">
-                                        New
-                                    </button>
+                            @else
+                                <div class="form-group">
+                                    <label for="fine_type" class="col-md-3 control-label">Accident Type</label>
+                                    <div class="col-md-7 required">
+                                        {{ Form::select('accident_type', isset($fine) ? [$fine->type->name] + $fine_type : ['' => 'Select'] + $fine_type, isset($fine) ? $fine->type->id : null, ['class' => 'form-control', 'id' => 'fine_type', 'required']) }}
+                                        {!! $errors->first(
+                                            'accident_type',
+                                            '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>',
+                                        ) !!}
+                                    </div>
+                                    <div class="col-md-1 col-sm-1 text-left">
+                                        <button type="button" id="accidentmodel" class="btn btn-primary"
+                                            data-toggle="modal" data-target="#accidentModal">
+                                            New
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
 
 
 
                             <!-- Amount -->
-                            <div style="display: none;" class="form-group {{ $errors->has('amount') ? 'error' : '' }}">
-                                {{ Form::label('amount', trans('general.amount'), ['class' => 'col-md-3 control-label']) }}
-                                <div class="col-md-7">
-                                    <input class="form-control" type="number" name="amount" id="amount"
-                                        value="{{ isset($fine) ? $fine->amount : '0' }}" readonly />
-                                    {!! $errors->first(
-                                        'amount',
-                                        '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>',
-                                    ) !!}
+                            @if (Request::is('create-accident*'))
+                                <div style="display: none;"
+                                    class="form-group {{ $errors->has('amount') ? 'error' : '' }}">
+                                    {{ Form::label('amount', trans('general.amount'), ['class' => 'col-md-3 control-label']) }}
+                                    <div class="col-md-7">
+                                        <input class="form-control" type="number" name="amount" id="amount"
+                                            value="{{ isset($fine) ? $fine->amount : '0' }}" readonly />
+                                        {!! $errors->first(
+                                            'amount',
+                                            '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>',
+                                        ) !!}
 
+                                    </div>
+                                    <span id="amount-error" class="text-danger mt-2" style="display:none;">No amount
+                                        found</span>
                                 </div>
-                                <span id="amount-error" class="text-danger mt-2" style="display:none;">No amount
-                                    found</span>
-                            </div>
+                            @else
+                                <div class="form-group {{ $errors->has('amount') ? 'error' : '' }}">
+                                    {{ Form::label('amount', trans('general.amount'), ['class' => 'col-md-3 control-label']) }}
+                                    <div class="col-md-7">
+                                        <input class="form-control" type="number" name="amount" id="amount"
+                                            value="{{ isset($fine) ? $fine->amount : '0' }}" readonly />
+                                        {!! $errors->first(
+                                            'amount',
+                                            '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>',
+                                        ) !!}
+
+                                    </div>
+                                    <span id="amount-error" class="text-danger mt-2" style="display:none;">No amount
+                                        found</span>
+                                </div>
+                            @endif
 
 
                             <!-- location       -->
-
-                            <div style="display: none;" class="form-group">
-                                <label for="location"
-                                    class="col-md-3 control-label">{{ trans('general.location') }}</label>
-                                <div class="col-md-7">
-                                    {{ Form::select('location', isset($fine) ? [$fine->findLocation->name] + $location : ['' => 'Select'] + $location, isset($fine) ? $fine->findLocation->id : null, ['class' => 'form-control', 'id' => 'location', 'required']) }}
+                            @if (Request::is('create-accident*'))
+                                <div style="display: none;" class="form-group">
+                                    <label for="location"
+                                        class="col-md-3 control-label">{{ trans('general.location') }}</label>
+                                    <div class="col-md-7">
+                                        {{ Form::select('location', isset($fine) ? [$fine->findLocation->name] + $location : ['' => 'Select'] + $location, isset($fine) ? $fine->findLocation->id : null, ['class' => 'form-control', 'id' => 'location', 'required']) }}
+                                    </div>
                                 </div>
-                            </div>
+                            @else
+                                <div class="form-group">
+                                    <label for="location"
+                                        class="col-md-3 control-label">{{ trans('general.location') }}</label>
+                                    <div class="col-md-7">
+                                        {{ Form::select('location', isset($fine) ? [$fine->findLocation->name] + $location : ['' => 'Select'] + $location, isset($fine) ? $fine->findLocation->id : null, ['class' => 'form-control', 'id' => 'location', 'required']) }}
+                                    </div>
+                                </div>
+                            @endif
 
                             <!-- image -->
-                            <div style="display: none;" class="form-group {{ $errors->has('note') ? 'error' : '' }}">
-                                {{ Form::label('Fine Image', 'Fine Image', ['class' => 'col-md-3 control-label']) }}
-                                <div class="col-md-7">
-                                    <input type="file" name="accident_image" id="fine_image">
+                            @if (Request::is('create-accident*'))
+                                <div style="display: none;" class="form-group {{ $errors->has('note') ? 'error' : '' }}">
+                                    {{ Form::label('Fine Image', 'Fine Image', ['class' => 'col-md-3 control-label']) }}
+                                    <div class="col-md-7">
+                                        <input type="file" name="accident_image" id="fine_image">
+                                    </div>
                                 </div>
-                            </div>
+                            @else
+                                <div class="form-group {{ $errors->has('note') ? 'error' : '' }}">
+                                    {{ Form::label('Fine Image', 'Fine Image', ['class' => 'col-md-3 control-label']) }}
+                                    <div class="col-md-7">
+                                        <input type="file" name="accident_image" id="fine_image">
+                                    </div>
+                                </div>
+                            @endif
+
 
                             <!-- note -->
-
-                            <div style="display: none;" class="form-group {{ $errors->has('note') ? 'error' : '' }}">
-                                {{ Form::label('note', trans('admin/hardware/form.notes'), ['class' => 'col-md-3 control-label']) }}
-                                <div class="col-md-7">
-                                    <textarea class="col-md-6 form-control" id="note" name="note">{{ isset($fine) ? $fine->note : '' }} </textarea>
-                                    {!! $errors->first(
-                                        'note',
-                                        '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times"
-                                                                                                                                                                                                                                                                                                                                    aria-hidden="true"></i> :message</span>',
-                                    ) !!}
+                            @if (Request::is('create-accident*'))
+                                <div style="display: none;" class="form-group {{ $errors->has('note') ? 'error' : '' }}">
+                                    {{ Form::label('note', trans('admin/hardware/form.notes'), ['class' => 'col-md-3 control-label']) }}
+                                    <div class="col-md-7">
+                                        <textarea class="col-md-6 form-control" id="note" name="note">{{ isset($fine) ? $fine->note : '' }} </textarea>
+                                        {!! $errors->first(
+                                            'note',
+                                            '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times"
+                                                                                                                                                                                                                                                                                                                                                                            aria-hidden="true"></i> :message</span>',
+                                        ) !!}
+                                    </div>
                                 </div>
-                            </div>
+                            @else
+                                <div class="form-group {{ $errors->has('note') ? 'error' : '' }}">
+                                    {{ Form::label('note', trans('admin/hardware/form.notes'), ['class' => 'col-md-3 control-label']) }}
+                                    <div class="col-md-7">
+                                        <textarea class="col-md-6 form-control" id="note" name="note">{{ isset($fine) ? $fine->note : '' }} </textarea>
+                                        {!! $errors->first(
+                                            'note',
+                                            '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times"
+                                                                                                                                                                                                                                                                                                                                                                            aria-hidden="true"></i> :message</span>',
+                                        ) !!}
+                                    </div>
+                                </div>
+                            @endif
                             <div class="box-footer">
                                 <a class="btn btn-link" href="{{ URL::previous() }}"> {{ trans('button.cancel') }}</a>
                                 <button type="submit" class="btn btn-primary pull-right"><i
@@ -349,7 +443,7 @@
                 $('.col-md-1.col-sm-1.text-left').css('display', 'block');
             });
         });
-        // fine type code
+        // Accident type code
         $('#fine_type').change(function() {
             var fineTypeId = $(this).val();
             $.ajax({
@@ -395,6 +489,11 @@
                 success: function(response) {
                     if (response.status === 'success') {
                         //alert('Data saved successfully!');
+                        $('#fine_type').append('<option value="' + response.data.id + '">' + response
+                            .data.name + '</option>');
+
+                        $('#modal-name').val('');
+                        $('#modal-amount').val('');
                         $('#accidentModal').modal('hide');
                     } else {
                         $('#modal_error_msg').text(response.message).show();
