@@ -47,22 +47,39 @@ class FineController extends Controller
       return (new FineTransformer)->transformfine($fines, $total);
    }
 
-   public function fineType(Request $request)
-   {
-      $this->authorize('view', fineType::class);
-      if (!$request->filled('name')) {
-         return response()->json(Helper::formatStandardApiResponse('error', null, ['Name' => ['Name is required.']]));
-      }
-      // Validate 'amount' field
+  
+public function fineType(Request $request)
+{
+    $this->authorize('view', FineType::class);
+
+    if (!$request->filled('name')) {
+        return response()->json(Helper::formatStandardApiResponse('error', null, ['Name' => ['Name is required.']]));
+    }
+
+    // Validate 'amount' field
     if (!$request->filled('amount')) {
-      return response()->json(Helper::formatStandardApiResponse('error', null, ['Amount' => ['Amount is required.']]));
-  }
-      $type = new FineType;
-      $type->name = $request->name;
-      $type->amount = $request->amount;
-      if ($type->save()) {
-         return response()->json(Helper::formatStandardApiResponse('success', $type, 'New Fine Type is Saved Successfully.'));
-      }
-      return response()->json(['message' => 'There is an error in saving']);
-   }
+        return response()->json(Helper::formatStandardApiResponse('error', null, ['Amount' => ['Amount is required.']]));
+    }
+
+    $type = new FineType;
+    $type->name = $request->name;
+    $type->amount = $request->amount;
+    
+    if ($type->save()) {
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'id' => $type->id,
+                'name' => $type->name
+            ],
+            'message' => 'New Accident Type is Saved Successfully.'
+        ]);
+    }
+    
+    return response()->json([
+        'status' => 'error',
+        'message' => 'There is an error in saving'
+    ]);
+}
+
 }

@@ -140,7 +140,7 @@ Route::post('/asset_maintenance_type_create', [
 
 //fine type
 
-Route::post('/fine_type', [Api\FineController::class, 'fineType'])->name('api.fine_type')->middleware('auth:api');
+Route::post('/fine_type', [Api\FineController::class, 'fineType'])->name('api.fine_type');
 
 
 Route::group(['prefix' => 'v1', 'middleware' => ['api', 'throttle:api']], function () {
