@@ -79,14 +79,16 @@
                             <!-- Date/Time -->
                             <div class="form-group">
                                 {{ Form::label('fine_date', trans('general.fine_date'), ['class' => 'col-md-3 control-label']) }}
-                                <div class="col-md-7 date" style="display: table">
+                                <div class="col-md-7" style="display: flex; align-items: center;">
                                     <!-- Date and Time Input -->
                                     <input type="datetime-local" id="fine_date" class="form-control"
-                                        placeholder="Select Date and Time (YYYY-MM-DD HH:MM)" name="fine_date"
-                                        value="{{ isset($fine) ? Carbon::parse($fine->created_at)->format('Y-m-d\TH:i') : Carbon::now()->format('Y-m-d\TH:i') }}">
-
+                                           placeholder="Select Date and Time (YYYY-MM-DD HH:MM)"
+                                           name="fine_date"
+                                           value="{{ isset($fine) ? Carbon::parse($fine->created_at)->format('Y-m-d\TH:i') : Carbon::now()->format('Y-m-d\TH:i') }}"
+                                           style="flex: 1;">
+                            
                                     <!-- Seconds Dropdown -->
-                                    <select id="fine_seconds" class="form-control mt-2" name="fine_seconds">
+                                    <select id="fine_seconds" class="form-control mt-2 ml-2" name="fine_seconds" style="width: auto;">
                                         @for ($i = 0; $i < 60; $i++)
                                             <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}"
                                                 {{ isset($fine) && Carbon::parse($fine->created_at)->format('s') == str_pad($i, 2, '0', STR_PAD_LEFT) ? 'selected' : '' }}>
@@ -94,10 +96,11 @@
                                             </option>
                                         @endfor
                                     </select>
-
-                                    <span id="asset-error" class="text-danger mt-2" style="display:none;"></span>
                                 </div>
+                            
+                                <span id="asset-error" class="text-danger mt-2" style="display:block; width: 100%;"></span>
                             </div>
+                            
 
 
                             <!-- asset  -->
@@ -222,7 +225,7 @@
         $(document).ready(function() {
             var username = '';
             var userId = '';
-            var dateSelected = false;
+            var dateSelected = true;
             var assetSelected = false;
             $('#fine_date').on('change', function() {
                 dateSelected = true;

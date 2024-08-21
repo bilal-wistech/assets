@@ -6,7 +6,7 @@
 
 {{-- Page title --}}
 @section('title')
-{{ trans('general.add_accident') }}
+    {{ trans('general.add_accident') }}
     @parent
 @stop
 
@@ -18,38 +18,40 @@
         }
     </style>
     <!-- Modal -->
-<div class="modal fade" id="accidentModal" tabindex="-1" role="dialog" aria-labelledby="accidentModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="accidentModalLabel">Accident Type</h3>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form action="{{ route('api.accident_type') }}" method="POST">
-                    @csrf
-                    <div class="alert alert-danger" id="modal_error_msg" style="display:none"></div>
-                    <div class="form-group">
-                        <label for="modal-name">{{ trans('general.name') }}:</label>
-                        <input type="text" name="name" id="modal-name" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label for="modal-amount">{{ trans('general.amount') }}:</label>
-                        <input type="text" name="amount" id="modal-amount" class="form-control" required>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ trans('button.cancel') }}</button>
-                <button type="button" class="btn btn-primary" id="modal-save">{{ trans('general.save') }}</button>
+    <div class="modal fade" id="accidentModal" tabindex="-1" role="dialog" aria-labelledby="accidentModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="accidentModalLabel">Accident Type</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('api.accident_type') }}" method="POST">
+                        @csrf
+                        <div class="alert alert-danger" id="modal_error_msg" style="display:none"></div>
+                        <div class="form-group">
+                            <label for="modal-name">{{ trans('general.name') }}:</label>
+                            <input type="text" name="name" id="modal-name" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="modal-amount">{{ trans('general.amount') }}:</label>
+                            <input type="text" name="amount" id="modal-amount" class="form-control" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                        data-dismiss="modal">{{ trans('button.cancel') }}</button>
+                    <button type="button" class="btn btn-primary" id="modal-save">{{ trans('general.save') }}</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
     <!-- /.modal-dialog -->
-    
+
     <!-- Selected user Modal -->
     <div class="modal fade" id="SelecteduserModal" tabindex="-1" role="dialog" aria-labelledby="SelecteduserModalLabel"
         aria-hidden="true">
@@ -112,30 +114,38 @@
                             <!-- Date/Time -->
                             <div class="form-group">
                                 {{ Form::label('accident_date', 'Accident Date', ['class' => 'col-md-3 control-label']) }}
-                                <div class="col-md-7 date" style="display: table">
-                                    <!-- Date and Time Input -->
-                                    <input type="datetime-local" id="accident_date" class="form-control"
-                                        placeholder="Select Date and Time (YYYY-MM-DD HH:MM)" name="accident_date"
-                                        value="{{ isset($fine) ? Carbon::parse($fine->created_at)->format('Y-m-d\TH:i') : Carbon::now()->format('Y-m-d\TH:i') }}">
-
-                                    <!-- Seconds Dropdown -->
-                                    <select id="fine_seconds" class="form-control mt-2" name="fine_seconds">
-                                        @for ($i = 0; $i < 60; $i++)
-                                            <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}"
-                                                {{ isset($fine) && Carbon::parse($fine->created_at)->format('s') == str_pad($i, 2, '0', STR_PAD_LEFT) ? 'selected' : '' }}>
-                                                {{ str_pad($i, 2, '0', STR_PAD_LEFT) }}
-                                            </option>
-                                        @endfor
-                                    </select>
-
-                                    <span id="asset-error" class="text-danger mt-2" style="display:none;"></span>
+                                <div class="col-md-7 date" style="display: flex; align-items: center; flex-direction: column;">
+                                    <div style="width: 100%; display: flex; align-items: center;">
+                                        <!-- Date and Time Input -->
+                                        <input type="datetime-local" id="accident_date" class="form-control"
+                                            style="width: 83%;" placeholder="Select Date and Time (YYYY-MM-DD HH:MM)"
+                                            name="accident_date"
+                                            value="{{ isset($fine) ? Carbon::parse($fine->created_at)->format('Y-m-d\TH:i') : Carbon::now()->format('Y-m-d\TH:i') }}">
+                            
+                                        <!-- Seconds Dropdown -->
+                                        <select id="fine_seconds" class="form-control" name="fine_seconds"
+                                            style="width: 17%;">
+                                            @for ($i = 0; $i < 60; $i++)
+                                                <option value="{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}"
+                                                    {{ isset($fine) && Carbon::parse($fine->created_at)->format('s') == str_pad($i, 2, '0', STR_PAD_LEFT) ? 'selected' : '' }}>
+                                                    {{ str_pad($i, 2, '0', STR_PAD_LEFT) }}
+                                                </option>
+                                            @endfor
+                                        </select>
+                                    </div>
+                            
+                                    <!-- Error Message -->
+                                    <span id="asset-error" class="text-danger mt-3" style="display:none; align-self: flex-start;"></span>
                                 </div>
                             </div>
+                            
+
 
 
                             <!-- asset  -->
                             <div class="form-group">
-                                <label for="asset_id" class="col-md-3 control-label">{{ trans('general.asset_id') }}</label>
+                                <label for="asset_id"
+                                    class="col-md-3 control-label">{{ trans('general.asset_id') }}</label>
                                 <div class="col-md-7">
                                     {{ Form::select('asset_id', isset($fine) ? [$fine->asset->name] + $assets : ['' => 'Select'] + $assets, isset($fine) ? $fine->asset->id : null, ['class' => 'form-control  select2', 'id' => 'asset_id', 'required']) }}
                                 </div>
@@ -174,7 +184,8 @@
                                     ) !!}
                                 </div>
                                 <div style="display: none;" class="col-md-1 col-sm-1 text-left">
-                                    <button type="button" id="accidentmodel" class="btn btn-primary" data-toggle="modal" data-target="#accidentModal">
+                                    <button type="button" id="accidentmodel" class="btn btn-primary"
+                                        data-toggle="modal" data-target="#accidentModal">
                                         New
                                     </button>
                                 </div>
@@ -187,14 +198,15 @@
                                 {{ Form::label('amount', trans('general.amount'), ['class' => 'col-md-3 control-label']) }}
                                 <div class="col-md-7">
                                     <input class="form-control" type="number" name="amount" id="amount"
-                                        value="{{ isset($fine) ? $fine->amount : '0'}}" readonly />
+                                        value="{{ isset($fine) ? $fine->amount : '0' }}" readonly />
                                     {!! $errors->first(
                                         'amount',
                                         '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>',
                                     ) !!}
 
                                 </div>
-                                <span id="amount-error" class="text-danger mt-2" style="display:none;">No amount found</span>
+                                <span id="amount-error" class="text-danger mt-2" style="display:none;">No amount
+                                    found</span>
                             </div>
 
 
@@ -225,7 +237,7 @@
                                     {!! $errors->first(
                                         'note',
                                         '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times"
-                                                                                                                                                                                                                                                                                                aria-hidden="true"></i> :message</span>',
+                                                                                                                                                                                                                                                                                                                                    aria-hidden="true"></i> :message</span>',
                                     ) !!}
                                 </div>
                             </div>
@@ -253,7 +265,7 @@
         $(document).ready(function() {
             var username = '';
             var userId = '';
-            var dateSelected = false;
+            var dateSelected = true;
             var assetSelected = false;
             $('#accident_date').on('change', function() {
                 dateSelected = true;
@@ -341,64 +353,66 @@
         $('#fine_type').change(function() {
             var fineTypeId = $(this).val();
             $.ajax({
-            url: '/get-accident-type-amount', 
-            type: 'GET',
-            data: { fine_type_id: fineTypeId },
-            success: function(response) {
-                if (response.amount !== undefined) {
-                    $('#amount').val(response.amount); 
-                    $('#amount-error').hide(); 
-                } else {
-                    $('#amount').val(0); 
-                    $('#amount-error').show();
+                url: '/get-accident-type-amount',
+                type: 'GET',
+                data: {
+                    fine_type_id: fineTypeId
+                },
+                success: function(response) {
+                    if (response.amount !== undefined) {
+                        $('#amount').val(response.amount);
+                        $('#amount-error').hide();
+                    } else {
+                        $('#amount').val(0);
+                        $('#amount-error').show();
+                    }
+                },
+                error: function() {
+                    $('#amount').val(0);
+                    $('#amount-error').text('Error occurred while fetching the amount').show();
                 }
-            },
-            error: function() {
-                $('#amount').val(0); 
-                $('#amount-error').text('Error occurred while fetching the amount').show(); 
-            }
-        });
+            });
 
         });
-  //Accident Modal code
-  $('#accidentmodel').on('click', function() {
-        $('#accidentModal').css('display', 'block');
-    });
-    // Handle save button click
-    $('#modal-save').on('click', function() {
-        // Serialize form data
-        var formData = {
-            name: $('#modal-name').val(),
-            amount: $('#modal-amount').val(),
-            _token: $('input[name="_token"]').val()
-        };
-
-        // AJAX request to save data
-        $.ajax({
-            url: "{{ route('api.accident_type') }}",
-            type: "POST",
-            data: formData,
-            success: function(response) {
-                if (response.status === 'success') {
-                    //alert('Data saved successfully!');
-                    $('#accidentModal').modal('hide'); 
-                } else {
-                    $('#modal_error_msg').text(response.message).show();
-                }
-            },
-            error: function(xhr) {
-                var errors = xhr.responseJSON.errors;
-                var errorMessages = '';
-                $.each(errors, function(key, value) {
-                    errorMessages += value[0] + '<br>';
-                });
-                $('#modal_error_msg').html(errorMessages).show();
-            }
+        //Accident Modal code
+        $('#accidentmodel').on('click', function() {
+            $('#accidentModal').css('display', 'block');
         });
-    });
-    $('.close, .btn-secondary').on('click', function() {
-        $('#accidentModal').modal('hide');
-    });
+        // Handle save button click
+        $('#modal-save').on('click', function() {
+            // Serialize form data
+            var formData = {
+                name: $('#modal-name').val(),
+                amount: $('#modal-amount').val(),
+                _token: $('input[name="_token"]').val()
+            };
+
+            // AJAX request to save data
+            $.ajax({
+                url: "{{ route('api.accident_type') }}",
+                type: "POST",
+                data: formData,
+                success: function(response) {
+                    if (response.status === 'success') {
+                        //alert('Data saved successfully!');
+                        $('#accidentModal').modal('hide');
+                    } else {
+                        $('#modal_error_msg').text(response.message).show();
+                    }
+                },
+                error: function(xhr) {
+                    var errors = xhr.responseJSON.errors;
+                    var errorMessages = '';
+                    $.each(errors, function(key, value) {
+                        errorMessages += value[0] + '<br>';
+                    });
+                    $('#modal_error_msg').html(errorMessages).show();
+                }
+            });
+        });
+        $('.close, .btn-secondary').on('click', function() {
+            $('#accidentModal').modal('hide');
+        });
 
         //end of accident type code
         $('.select2').select2();

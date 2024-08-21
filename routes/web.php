@@ -69,7 +69,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/store-accident', [AccidentController::class, 'store'])->name('accidents.store');
     // Route::get('/show/{id}', [AccidentController::class, 'show'])->name('fines.show');
     Route::get('accident/{id}/edit', [AccidentController::class, 'edit'])->name('accidents.edit');
-    Route::post('fine/{id}/update', [AccidentController::class, 'update'])->name('accidents.update');
+    Route::post('accident/{id}/update', [AccidentController::class, 'update'])->name('accidents.update');
     Route::match(['get', 'post'], 'accident/{id}/delete', [AccidentController::class, 'destroy'])->name('accidents.del');
     Route::get('/fetch-accidents', [AccidentController::class, 'fetchAccidents'])->name('fetch-accidents');
     Route::get('/get-accident-type-amount', [AccidentController::class, 'getFineTypeAmount']);
