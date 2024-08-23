@@ -194,20 +194,23 @@ class InsuranceController extends Controller
      */
     public function destroy($insurance_id = null)
     {
+        
         $this->authorize('delete', Insurance::class);
+        $data = Insurance::find($insurance_id);
+        $data->delete();
         // Check if the category exists
-        if (is_null($insurance = Insurance::findOrFail($insurance_id))) {
-            return redirect()->route('insurance.index')->with('error', trans('admin/insurance/message.not_found'));
-        }
+        // if (is_null($insurance = Insurance::findOrFail($insurance_id))) {
+        //     return redirect()->route('insurance.index')->with('error', trans('admin/insurance/message.not_found'));
+        // }
 
-        if (! $insurance->isDeletable()) {
-            return redirect()->route('insurance.index')->with('error', trans('admin/insurance/message.notdeleteable'));
-        }
+        // if (! $insurance->isDeletable()) {
+        //     return redirect()->route('insurance.index')->with('error', trans('admin/insurance/message.notdeleteable'));
+        // }
 
-        $insurance->delete();
-        AllowedDrivers::where(['insurance_id'=>$insurance_id])->delete();
+        // $insurance->delete();
+        // AllowedDrivers::where(['insurance_id'=>$insurance_id])->delete();
         // Redirect to the locations management page
-        return redirect()->route('insurance.index')->with('success', trans('admin/insurance/message.delete.success'));
+        return redirect()->route('insurance.index')->with('success', 'data deleted successfully');
     }
 
     

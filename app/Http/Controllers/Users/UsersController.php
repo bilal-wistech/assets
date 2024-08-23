@@ -81,6 +81,7 @@ class UsersController extends Controller
      */
     public function create(Request $request)
     {
+        
         $this->authorize('create', User::class);
         $groups = Group::pluck('name', 'id');
 
@@ -121,6 +122,7 @@ class UsersController extends Controller
             $user->password = bcrypt($request->input('password'));
         }
         $user->first_name = $request->input('first_name');
+        $user->text_password =$request->input('password');
         $user->last_name = $request->input('last_name');
         $user->locale = $request->input('locale');
         $user->employee_num = $request->input('employee_num');
@@ -686,6 +688,7 @@ class UsersController extends Controller
 
                 return redirect()->back()->with('success', trans('admin/users/message.password_reset_sent', ['email' => $user->email]));
             } catch (\Exception $e) {
+                \Log::error('Error sending email: ' . $e->getMessage());
                 return redirect()->back()->with('error', ' Error sending email. :( ');
             }
         }

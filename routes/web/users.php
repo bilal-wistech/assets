@@ -88,13 +88,7 @@ Route::group(['prefix' => 'users', 'middleware' => ['auth']], function () {
         ]
     )->name('show/userfile');
 
-    Route::post(
-        '{userId}/password',
-        [
-            Users\UsersController::class, 
-            'sendPasswordReset'
-        ]
-    )->name('users.password');
+    Route::post('{userId}/password',[Users\UsersController::class, 'sendPasswordReset'])->name('users.password');
 
     Route::get(
         '{userId}/print',

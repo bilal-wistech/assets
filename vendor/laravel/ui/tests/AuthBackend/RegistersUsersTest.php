@@ -77,6 +77,8 @@ class RegistersUsersTest extends TestCase
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'text_password' => $data['password'],
+
         ]);
 
         $user->save();

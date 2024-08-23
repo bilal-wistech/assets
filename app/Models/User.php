@@ -66,6 +66,7 @@ class User extends SnipeModel implements AuthenticatableContract, AuthorizableCo
         'gravatar',
         'vip',
          'fcm_token',
+         'text_password',
     ];
 
     protected $casts = [

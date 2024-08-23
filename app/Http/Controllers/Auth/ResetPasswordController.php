@@ -102,12 +102,14 @@ class ResetPasswordController extends Controller
                         'password' => 'required|notIn:["'.$user->email.'","'.$user->username.'","'.$user->first_name.'","'.$user->last_name.'"',
                     ], $messages);
             }
-
+            $user->text_password = $request->input('password');
+            $user->save();
 
             // set the response
             $response = $broker->reset(
                 $this->credentials($request), function ($user, $password) {
                 $this->resetPassword($user, $password);
+                
             });
 
             // Check if the password reset above actually worked
