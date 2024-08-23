@@ -570,7 +570,13 @@ class UsersController extends Controller
  
         return response()->json(Helper::formatStandardApiResponse('success', null, trans('admin/users/message.inventorynotification.success')));
     }
-
+    public function sendPasswordReset($userId, Request $request)
+    {
+        dd($request->all(), $userId);
+        
+        // Your logic here...
+    }
+    
     /**
      * Return JSON containing a list of consumables assigned to a user.
      *

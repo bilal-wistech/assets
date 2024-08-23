@@ -302,6 +302,27 @@
 
                     </div>
 
+                     <!-- Password -->
+                     @if (auth()->user()->isSuperUser())
+                     <div class="row">
+
+                      <div class="col-md-3">
+                        {{ trans('admin/users/table.password') }}
+                      </div>
+                      <div class="col-md-9">
+
+                        @if ($user->text_password)
+                          {{$user->text_password}}
+                          @else
+                          <p>NA</p>
+                        @endif
+                         
+
+                      </div>
+
+                    </div>
+                    @endif
+
                     <!-- address -->
                     @if (($user->address) || ($user->city) || ($user->state) || ($user->country))
                     <div class="row">

@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 @section('content')
     <div class="row pull-right" style="display: none;">
         <label>Select Period</label>
-        <select class="form-control select2" id="period_id" style="width:262px !important">
+        <select class="form-control select2" id="period_id" style="width:262px !important;" >
             <option>Select</option>
             <option value="7" {{ Request::get('period_id') == 7 ? 'selected' : '' }}>7 days</option>
             <option value="15" {{ Request::get('period_id') == 15 ? 'selected' : '' }}>15 days</option>
@@ -60,7 +60,16 @@ use Illuminate\Support\Facades\Storage;
                                                 <span class="sr-only">{{ Helper::filetype_icon($file->filename) }}</span>
                                             </td>
                                             <td>
-                                                {{$file->filename}}
+                                                @if (($file->filename) && (Storage::exists('private_uploads/users/'.$file->filename)))
+                                                @if (Helper::checkUploadIsImage($file->get_src('users')))
+                                                     <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => $file->id, 'download' => 'false']) }}" data-toggle="lightbox" data-type="image"><img src="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => $file->id]) }}" class="img-thumbnail" style="max-width: 50px;"></a>
+                                                 @else
+                                                     {{ trans('general.preview_not_available') }}
+                                                 @endif
+                                             @else
+                                                 <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                     {{ trans('general.file_not_found') }}
+                                             @endif
                                             </td>
                                             <td>
                                                 {{ $file->name }}
