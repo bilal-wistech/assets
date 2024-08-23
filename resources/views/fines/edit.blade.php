@@ -6,7 +6,12 @@
 
 {{-- Page title --}}
 @section('title')
-    {{ trans('general.add_fine') }}
+@if (Request::is('create'))
+{{ trans('general.add_fine') }}
+    @else
+    Edit Fine
+    @endif
+    
     @parent
 @stop
 
@@ -100,7 +105,11 @@
         <div class="col-md-9">
             <div class="box box-default">
                 <div class="box-header with-border">
-                    <!-- <h2 class="box-title">{{ trans('general.add_fine') }} </h2> -->
+                    <!-- <h2 class="box-title">@if (Request::is('create'))
+{{ trans('general.add_fine') }}
+    @else
+    Edit Fine
+    @endif </h2> -->
                 </div><!-- /.box-header -->
                 <div class="box-body">
                     <div class="col-md-12">

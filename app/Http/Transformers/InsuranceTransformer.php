@@ -32,7 +32,10 @@ class InsuranceTransformer
             $array = [
                 'id'             => (int) $insurance->id,
 
-                'asset_id' => '<a href="'.url("/insuranceDetail/".$insurance->id).'" data-tooltip="true" title="" data-original-title="asset"><i class="fas fa-barcode text-blue "></i> '.$insurance->asset->name.' ('.$insurance->asset->asset_tag.')</a>',
+                'asset_id' => $insurance->asset ? 
+    '<a href="'.url("/insuranceDetail/".$insurance->id).'" data-tooltip="true" title="" data-original-title="asset"><i class="fas fa-barcode text-blue "></i> '.$insurance->asset->name.' ('.$insurance->asset->asset_tag.')</a>' 
+    : 'No asset available',
+
 
 
                 // 'asset_id'       => $insurance->asset->name,
@@ -55,7 +58,7 @@ class InsuranceTransformer
 
             $permissions_array['available_actions'] = [
                 'update' => Gate::allows('update', Insurance::class),
-                'delete' => false,//$insurance->isDeletable(),
+                'delete' => Gate::allows('delete', Insurance::class),
             ];
 
 

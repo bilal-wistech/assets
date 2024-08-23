@@ -37,6 +37,7 @@ class DocumentController extends Controller
         }
         $user = Actionlog::whereNotNull('expiry_date')
                 ->get();
+                
                 //dd($user);
         return view('documents.index')->with('user', $user);
         

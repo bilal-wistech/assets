@@ -294,18 +294,17 @@
 
                     if (dest == 'insurance') {
                         name_for_box = 'insurance';
-                        actions += '<a href="{{ config('app.url') }}/' + dest + '/' + row.id + '/delete" ' +
-                            ' class="actions btn btn-danger btn-sm delete-asset" data-tooltip="true"  ' +
-                            ' data-toggle="modal" ' +
-                            ' data-content="{{ trans('general.sure_to_delete') }} ' + name_for_box + '?" ' +
-                            ' data-title="{{ trans('general.delete') }}" onClick="return false;">' +
-                            '<i class="fas fa-trash" aria-hidden="true"></i><span class="sr-only">{{ trans('general.delete') }}</span></a>&nbsp;';
+                        actions += '<a href="' + 
+    '{{ route('insurance.delete', ['insurance_id' => 'REPLACE_ID']) }}'.replace('REPLACE_ID', row.id) + '" ' +
+    'class="actions btn btn-danger btn-sm" data-tooltip="true" ' +
+    'data-title="{{ trans('general.delete') }}" onClick="return confirm(\'Are you sure you want to delete this record?\');">' +
+    '<i class="fas fa-trash" aria-hidden="true"></i><span class="sr-only">{{ trans('general.delete') }}</span></a>&nbsp;';
 
                     } else if (dest == 'fine') {
 
                         actions += '<a href="' + '{{ route('fines.del', ['id' => 'REPLACE_ID']) }}'.replace('REPLACE_ID', row.id) + '" ' +
            ' class="actions btn btn-danger btn-sm" data-tooltip="true" ' +
-           ' data-title="{{ trans('general.delete') }}" onClick="return confirm(\'Are you sure?\');">' +
+           ' data-title="{{ trans('general.delete') }}" onClick="return confirm(\'Are you sure you want to delete this record?\');">' +
            '<i class="fas fa-trash" aria-hidden="true"></i><span class="sr-only">{{ trans('general.delete') }}</span></a>&nbsp;';
 
 
@@ -314,7 +313,7 @@
 
 actions += '<a href="' + '{{ route('accidents.del', ['id' => 'REPLACE_ID']) }}'.replace('REPLACE_ID', row.id) + '" ' +
 ' class="actions btn btn-danger btn-sm" data-tooltip="true" ' +
-' data-title="{{ trans('general.delete') }}" onClick="return confirm(\'Are you sure?\');">' +
+' data-title="{{ trans('general.delete') }}" onClick="return confirm(\'Are you sure you want to delete this record?\');">' +
 '<i class="fas fa-trash" aria-hidden="true"></i><span class="sr-only">{{ trans('general.delete') }}</span></a>&nbsp;';
 
 

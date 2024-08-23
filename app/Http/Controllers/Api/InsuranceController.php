@@ -108,10 +108,12 @@ class InsuranceController extends Controller
 
         // Make sure the offset and limit are actually integers and do not exceed system limits
         $offset = ($request->input('offset') > $insurances->count()) ? $insurances->count() : abs($request->input('offset'));
+        
         // $limit = app('api_limit_value');
-        $limit = config('app.max_results');
-
+        $limit = (int) $request->input('limit', config('app.max_results', 500));
+        
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
+        
         $sort = in_array($request->input('sort'), $allowed_columns) ? $request->input('sort') : 'asset_id';
         $insurances->orderBy($sort, $order);
 

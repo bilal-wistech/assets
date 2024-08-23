@@ -198,17 +198,13 @@ class AssetsController extends Controller
         }
 
         $request->filled('order_number') ? $assets = $assets->where('assets.order_number', '=', e($request->get('order_number'))) : '';
-
         // Set the offset to the API call's offset, unless the offset is higher than the actual count of items in which
         // case we override with the actual count, so we should return 0 items.
-        $offset = (($assets) && ($request->get('offset') > $assets->count())) ? $assets->count() : $request->get('offset', 0);
-
-
+        $offset = 0;
         // Check to make sure the limit is not higher than the max allowed
-        ((config('app.max_results') >= $request->input('limit')) && ($request->filled('limit'))) ? $limit = $request->input('limit') : $limit = config('app.max_results');
-
+        $limit =  $request->input('limit');
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
-
+        
         // This is used by the audit reporting routes
         if (Gate::allows('audit', Asset::class)) {
             switch ($audit) {
@@ -228,6 +224,7 @@ class AssetsController extends Controller
         // We switched from using query scopes here because of a Laravel bug
         // related to fulltext searches on complex queries.
         // I am sad. :(
+        
         switch ($request->input('status')) {
             case 'Deleted':
                 $assets->onlyTrashed();
@@ -259,6 +256,7 @@ class AssetsController extends Controller
                         ->where('status_alias.pending', '=', 0)
                         ->where('status_alias.archived', '=', 1);
                 });
+                
                 break;
             case 'Requestable':
                 $assets->where('assets.requestable', '=', 1)
@@ -352,8 +350,12 @@ class AssetsController extends Controller
 
 
         $total = $assets->count();
-        $assets = $assets->skip($offset)->take($limit)->get();
         
+//         $offset = 0; // Example default value
+// $limit = 5; // Example default value
+
+$assets = $assets->skip($offset)->take($limit)->get();
+     
 
         /**
          * Include additional associated relationships

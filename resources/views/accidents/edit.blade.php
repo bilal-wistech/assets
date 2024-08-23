@@ -6,7 +6,11 @@
 
 {{-- Page title --}}
 @section('title')
+@if (Request::is('create-accident*'))
     {{ trans('general.add_accident') }}
+    @else
+    Edit Accident
+    @endif
     @parent
 @stop
 
@@ -103,7 +107,11 @@
         <div class="col-md-9">
             <div class="box box-default">
                 <div class="box-header with-border">
-                    <!-- <h2 class="box-title">{{ trans('general.add_accident') }} </h2> -->
+                    <!-- <h2 class="box-title">@if (Request::is('create-accident*'))
+    {{ trans('general.add_accident') }}
+    @else
+    Edit Accident
+    @endif </h2> -->
                 </div><!-- /.box-header -->
                 <div class="box-body">
                     <div class="col-md-12">

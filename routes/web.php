@@ -47,7 +47,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::get('/insurance/view/{id}', 'view')->name('insurance.view');
         Route::get('/insuranceDetail/{id}', 'showDetail')->name('insurance.showDetail');
 
-        Route::match(['delete'], '/insurance/{insurance_id}/delete', 'destroy')->name('insurance.delete');
+        Route::match(['get', 'post'], '/insurance/{insurance_id}/delete', 'destroy')->name('insurance.delete');
         Route::match(['post', 'get'], '/getDriverField', 'getDriverField');
     });
 
