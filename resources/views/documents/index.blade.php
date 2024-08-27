@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Storage;
 @stop
 {{-- Page content --}}
 @section('content')
-    <div class="row pull-right" style="display: none;">
+    <div class="row pull-right" >
         <label>Select Period</label>
-        <select class="form-control select2" id="period_id" style="width:262px !important;" >
+        <select class="form-control select2" id="period_id" style="width:262px !important;">
             <option>Select</option>
             <option value="7" {{ Request::get('period_id') == 7 ? 'selected' : '' }}>7 days</option>
             <option value="15" {{ Request::get('period_id') == 15 ? 'selected' : '' }}>15 days</option>
@@ -35,7 +35,7 @@ use Illuminate\Support\Facades\Storage;
                                 data-show-export="true" data-show-footer="true" data-toolbar="#upload-toolbar"
                                 data-show-refresh="true" data-sort-order="asc" data-sort-name="name"
                                 class="table table-striped snipe-table">
-                                
+
                                 <thead>
                                     <tr>
                                         <th data-visible="true" data-field="icon" data-sortable="true">
@@ -44,49 +44,73 @@ use Illuminate\Support\Facades\Storage;
                                             {{ trans('general.image') }}</th>
                                         <th class="col-md-2" data-searchable="true" data-visible="true" data-field="name">
                                             {{ trans('general.name') }}</th>
-                                        <th class="col-md-2" data-searchable="true" data-visible="true" data-field="expiry_date">
+                                        <th class="col-md-2" data-searchable="true" data-visible="true"
+                                            data-field="expiry_date">
                                             {{ trans('general.expiry_date') }}</th>
-                                        <th class="col-md-2" data-searchable="true" data-visible="true" data-field="notes" data-sortable="true">
+                                        <th class="col-md-2" data-searchable="true" data-visible="true" data-field="notes"
+                                            data-sortable="true">
                                             {{ trans('general.notes') }}</th>
-                                        <th class="col-md-2" data-searchable="true" data-visible="true" data-field="created_at" data-sortable="true">
+                                        <th class="col-md-2" data-searchable="true" data-visible="true"
+                                            data-field="created_at" data-sortable="true">
                                             {{ trans('general.created_at') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($user as $file)
-                                        <tr>
-                                            <td>
-                                                <i class="{{ Helper::filetype_icon($file->filename) }} icon-med" aria-hidden="true"></i>
-                                                <span class="sr-only">{{ Helper::filetype_icon($file->filename) }}</span>
-                                            </td>
-                                            <td>
-                                                @if (($file->filename) && (Storage::exists('private_uploads/users/'.$file->filename)))
-                                                @if (Helper::checkUploadIsImage($file->get_src('users')))
-                                                     <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => $file->id, 'download' => 'false']) }}" data-toggle="lightbox" data-type="image"><img src="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => $file->id]) }}" class="img-thumbnail" style="max-width: 50px;"></a>
-                                                 @else
-                                                     {{ trans('general.preview_not_available') }}
-                                                 @endif
-                                             @else
-                                                 <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                                                     {{ trans('general.file_not_found') }}
-                                             @endif
-                                            </td>
-                                            <td>
-                                                {{ $file->name }}
-                                            </td>
-                                            <td>
-                                                {{ $file->expiry_date }}
-                                            </td>
-                                            <td>
-                                                @if ($file->note)
-                                                    {{ $file->note }}
-                                                @endif
-                                            </td>
-                                            <td>
-                                                {{ $file->created_at }}
-                                            </td>
-                                        </tr>
+                                    @foreach ($asset as $assetItem)
+                                        @foreach ($assetItem->uploads as $file)
+                                            @php
+                                                // Construct the file path
+                                                $filePath = 'private_uploads/assets/' . $file->filename;
+
+                                                // Check if the file exists
+                                                $exists = Storage::disk('local')->exists($filePath);
+                                                $fileExtension = pathinfo($file->filename, PATHINFO_EXTENSION);
+                                                $isImage = in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif']);
+                                            @endphp
+                                            <tr>
+                                                <td>
+                                                    <i class="{{ Helper::filetype_icon($file->filename) }} icon-med"
+                                                        aria-hidden="true"></i>
+                                                    <span
+                                                        class="sr-only">{{ Helper::filetype_icon($file->filename) }}</span>
+                                                </td>
+                                                <td>
+                                                    @if ($exists)
+                                                        @if ($isImage)
+                                                            <a href="{{ route('show/assetfile', ['assetId' => $assetItem->id, 'fileId' => $file->id]) }}"
+                                                                data-toggle="lightbox" data-type="image"
+                                                                data-title="{{ $file->filename }}"
+                                                                data-footer="{{ Helper::getFormattedDateObject($assetItem->last_checkout, 'datetime', false) }}">
+                                                                <img src="{{ route('show/assetfile', ['assetId' => $assetItem->id, 'fileId' => $file->id]) }}"
+                                                                    style="max-width: 50px;">
+                                                            </a>
+                                                        @else
+                                                            <i class="fa fa-file" aria-hidden="true"></i>
+                                                            {{ $file->filename }}
+                                                        @endif
+                                                    @else
+                                                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                        {{ trans('general.file_not_found') }}
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    {{ $file->name }}
+                                                </td>
+                                                <td>
+                                                    {{ $file->expiry_date }}
+                                                </td>
+                                                <td>
+                                                    @if ($file->note)
+                                                        {{ $file->note }}
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    {{ $file->created_at }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
                                     @endforeach
+
                                 </tbody>
                             </table>
                         </div>

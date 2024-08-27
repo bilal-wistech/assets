@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Insurance;
 use App\Helpers\Helper;
 use App\Models\Actionlog;
+use App\Models\Asset;
 use Carbon\Carbon;
 use App\Models\User;
 
@@ -23,23 +24,38 @@ class DocumentController extends Controller
 
         if($request->has('period_id'))
         {
+            //dd("ok");
             $periodId = request('period_id');
             $currentDate = Carbon::now();
             $expiryDate = $currentDate->copy()->addDays($periodId);
-            // $user = $user->uploads->where('expiry_date', '>', $currentDate)
-            //     ->where('expiry_date', '<=', $expiryDate)
-            //     ->get();
-                // dd($user);
-                $user =Actionlog::where('expiry_date', '>', $currentDate)
+            
+                $allids =Actionlog::where('expiry_date', '>', $currentDate)
                     ->where('expiry_date', '<=', $expiryDate)->get();
+                    $itemIds = $allids->pluck('item_id')->unique();
+        
+        $asset = Asset::whereIn('id', $itemIds)
+    ->with('uploads') // Eager load the uploads relationship
+    ->withTrashed() // Include soft deleted records
+    ->get();
              //   dd($user);
-           return view('documents.index')->with('user', $user);
+           return view('documents.index')->with('asset', $asset);
         }
-        $user = Actionlog::whereNotNull('expiry_date')
+        $allids = Actionlog::whereNotNull('expiry_date')
                 ->get();
+                // Extract item_ids from the Actionlog records
+        $itemIds = $allids->pluck('item_id')->unique();
+        
+        $asset = Asset::whereIn('id', $itemIds)
+    ->with('uploads') // Eager load the uploads relationship
+    ->withTrashed() // Include soft deleted records
+    ->get();
+
+
+                
+        $this->authorize('view', $asset);
                 
                 //dd($user);
-        return view('documents.index')->with('user', $user);
+        return view('documents.index')->with('asset', $asset);
         
     }
 
