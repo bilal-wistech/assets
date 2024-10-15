@@ -22,6 +22,7 @@ use App\Models\Manufacturer;
 use App\Models\PredefinedKit;
 use App\Models\Statuslabel;
 use App\Models\Supplier;
+use App\Models\TowingRequest;
 use App\Models\TypeOfExpence;
 use App\Models\User;
 use App\Policies\AccessoryPolicy;
@@ -45,6 +46,7 @@ use App\Policies\PredefinedKitPolicy;
 use App\Policies\ReExpencePolicy;
 use App\Policies\StatuslabelPolicy;
 use App\Policies\SupplierPolicy;
+use App\Policies\TowingPolicy;
 use App\Policies\TypeOfExpencePolicy;
 use App\Policies\UserPolicy;
 use Carbon\Carbon;
@@ -84,6 +86,7 @@ class AuthServiceProvider extends ServiceProvider
         Insurance::class => AssetInsurancePolicy::class,
         TypeOfExpence::class => TypeOfExpencePolicy::class,
         Fine::class => FinePolicy::class,
+        TowingRequest::class => TowingPolicy::class,
     ];
 
     /**
@@ -167,6 +170,12 @@ class AuthServiceProvider extends ServiceProvider
         // access for the reimmensible expense
         Gate::define('add_expences.view', function ($user) {
             if ($user->hasAccess('add_expences.view')) {
+                return true;
+            }
+        });
+        // access for the Towing Request
+        Gate::define('towing_requests.view', function ($user) {
+            if ($user->hasAccess('towing_requests.view')) {
                 return true;
             }
         });

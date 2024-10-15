@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Asset;
 use App\Helpers\Helper;
+use App\Models\Statuslabel;
+use Illuminate\Support\Arr;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Transformers\AssetsTransformer;
-use App\Http\Transformers\StatuslabelsTransformer;
-use App\Models\Asset;
-use App\Models\Statuslabel;
-use Illuminate\Http\Request;
 use App\Http\Transformers\PieChartTransformer;
-use Illuminate\Support\Arr;
+use App\Http\Transformers\StatuslabelsTransformer;
 
 class StatuslabelsController extends Controller
 {
@@ -192,21 +193,44 @@ class StatuslabelsController extends Controller
      * @since [v3.0]
      * @return array
      */
-    public function getAssetCountByStatuslabel()
+    public function getAssetCountByStatuslabel(Request $request)
     {
+        $total_deployed = $request->total_deployed;
+       
         $this->authorize('view', Statuslabel::class);
         $statuslabels = Statuslabel::withCount('assets')->get();
+        
+    // dd(Statuslabel::get()->toArray());
+
         $total = Array();
 
         foreach ($statuslabels as $statuslabel) {
+            $count = $statuslabel->assets_count;
+            $label = $statuslabel->name;
 
-            $total[$statuslabel->name]['label'] = $statuslabel->name;
-            $total[$statuslabel->name]['count'] = $statuslabel->assets_count;
+            if(strtolower($label) == 'pending'){
+                $count = Asset::Pending()->count();
+            }
+            if(strtolower($label) == 'archived'){
+                $count = Asset::Archived()->count();
+            }
+            if(strtolower($label) == 'ready to deploy'){
+                $count = Asset::RTD()->count();
+            }
+
+            // Pending
+            $total[$label]['label'] = $label;
+            $total[$label]['count'] = $count;
+
 
             if ($statuslabel->color != '') {
                 $total[$statuslabel->name]['color'] = $statuslabel->color;
             }
         }
+
+        $total["All Deployed"]['label'] = "All Deployed";
+        $total["All Deployed"]['count'] = $total_deployed;
+        $total["All Deployed"]['color'] = "black";
 
         return (new PieChartTransformer())->transformPieChartDate($total);
 

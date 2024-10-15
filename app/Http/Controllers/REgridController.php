@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\AddExpence;
 use Illuminate\Http\Request;
+use App\Models\TowingRequest;
 use App\Exports\ReimmensibleExport;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -50,9 +51,18 @@ class REgridController extends Controller
     public function show()
 
     {
+       
         $this->authorize('view', AddExpence::class);
         $users = User::all();
         return view('layouts/regrid/show')->with('users', $users);
+        
+    }
+    public function show_towing_requests()
+
+    {
+        $this->authorize('view', TowingRequest::class);
+        $users = User::all();
+        return view('layouts/regrid/towingrequest')->with('users', $users);
         
     }
 

@@ -741,6 +741,15 @@ return [
             'note' => '',
             'display' => true,
         ],
+        
+    ],
+    'Towing Requests' => [
+        [
+            'permission' => 'towing_requests.view',
+            'label' => 'View',
+            'note' => '',
+            'display' => true,
+        ],
     ],
     'Fines' => [
         [
@@ -763,6 +772,32 @@ return [
         ],
         [
             'permission' => 'fines.delete',
+            'label' => 'Delete ',
+            'note' => '',
+            'display' => true,
+        ],
+    ],
+    'Accident' => [
+        [
+            'permission' => 'accidents.view',
+            'label' => 'View ',
+            'note' => '',
+            'display' => true,
+        ],
+        [
+            'permission' => 'accidents.create',
+            'label' => 'Create ',
+            'note' => '',
+            'display' => true,
+        ],
+        [
+            'permission' => 'accidents.edit',
+            'label' => 'Edit ',
+            'note' => '',
+            'display' => true,
+        ],
+        [
+            'permission' => 'accidents.delete',
             'label' => 'Delete ',
             'note' => '',
             'display' => true,

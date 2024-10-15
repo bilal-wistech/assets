@@ -20,13 +20,13 @@ class AuthController extends Controller
         $credentials = $request->only('username', 'password', 'expoPushToken');
 
         $user = User::where('username', $request->username)->first();
-
+       
         //  return $user;
         if ($user) {
-            $data = json_decode($user->permissions, true);
-            $superuser = $data['superuser'];
-            $admin = $data['admin'];
-            if ($superuser == 0 && $admin == 0) {
+            //$data = json_decode($user->permissions, true);
+            // $superuser = $data['superuser'];
+            // $admin = $data['admin'];
+            
                 if (Hash::check($request->password, $user->password)) {
                     $token = $user->createToken('token')->accessToken;
 
@@ -57,10 +57,7 @@ class AuthController extends Controller
                     $response = ["message" => "Password mismatch"];
                     return response($response, 422);
                 }
-            } else {
-                $response = ["message" => 'User is admin or a super user, cant provide access'];
-                return response($response, 422);
-            }
+            
         } else {
             $response = ["message" => 'User does not exist'];
             return response($response, 422);

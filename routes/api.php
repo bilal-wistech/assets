@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AccidentController;
 
 
+
 // use Illuminate\Http\Request;
 
 
@@ -20,6 +21,16 @@ use App\Http\Controllers\Api\AccidentController;
 */
 
 // user site
+Route::get('/user/{user_id?}', [Api\LocationsController::class, 'getUserProfileData']);
+Route::post('/users/{id}', [Api\LocationsController::class, 'updateProfile'])->middleware('api');
+
+//Route::post('/userupdate/{id?}', [Api\UsersController::class, 'updateusersprofile']);
+Route::post('/towingrequest', [Api\LocationsController::class, 'storetowingdata'])->middleware('api');
+Route::post('/failedrequest', [Api\LocationsController::class, 'failedtowingdata'])->middleware('api');
+Route::get('/insurance/{asset_id?}', [Api\LocationsController::class, 'getUserPhone'])->middleware('api');
+Route::get('/singleuserhistory/{user_id?}', [Api\LocationsController::class, 'getSingleUserData'])->middleware('api');
+Route::get('/fetch-questions', [Api\LocationsController::class, 'GetQuestionsLists'])->middleware('api');
+Route::get('/fetch-locations', [Api\LocationsController::class, 'GetLocationsLists'])->middleware('api');
 Route::post('/Userlogin', [Api\AuthController::class, 'login'])->name('api.Userlogin');
 
 Route::group(['prefix' => 'v1', 'middleware' => ['api', 'throttle:api']], function () {
@@ -129,6 +140,7 @@ Route::group(['middleware' => ['api', 'throttle:api']], function () {
     Route::get('/index/{id}', [Api\REgridController::class, 'index'])->name('expence.index');
 
     Route::get('/show_data/{id?}', [Api\REgridController::class, 'show'])->name('expence.show_data');
+    Route::get('/show_towing_data/{id?}', [Api\REgridController::class, 'showtowingdata'])->name('expence.show_towing_data');
     Route::get('/type/index', [Api\REgridController::class, 'ShowExpenseType'])->name('api.type.index');
     Route::get('/tsrepairoptions/index',
         [Api\RepairOptionsController::class, 'ShowRepairOptions'])->name('api.repairoptions.index');
@@ -899,6 +911,7 @@ Route::group(['prefix' => 'v1', 'middleware' => ['api', 'throttle:api']], functi
     /**
      * Locations API routes
      */
+    
     Route::group(['prefix' => 'locations'], function () {
 
         Route::get(

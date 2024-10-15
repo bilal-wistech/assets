@@ -151,6 +151,100 @@
                     <div class="navbar-custom-menu">
 
                         <ul class="nav navbar-nav">
+                            <li aria-hidden="true" tabindex="-1">
+                        @if (Auth::check()&& auth()->user()->isSuperUser())
+                            @php
+                                $results = DB::select("
+    SELECT 
+        insurance.asset_id,
+        insurance.notification,
+        users.username
+    FROM 
+        insurance
+    LEFT JOIN 
+        towings_requests ON insurance.asset_id = towings_requests.asset_id
+    LEFT JOIN 
+        users ON towings_requests.user_id = users.id
+    WHERE 
+        insurance.notification = 1
+    GROUP BY 
+        insurance.asset_id, users.username
+");
+                    $collection = collect($results);
+    $count = $collection->count();
+                            @endphp
+                            <a href="#" id="notificationBell" style="color: white;" accesskey="1" tabindex="-1">
+                                <i class="fas fa-bell fa-fw" aria-hidden="true"></i>
+                                <span class="badge badge-pill badge-danger"
+                                    style="position: relative; top: -10px; right: 10px; background-color: red;">
+                                    <span id="notificationCount">{{ $count }}</span>
+                                </span>
+                            </a>
+                            <div id="notificationDropdown"
+                                style="display: none; position: absolute; background-color: #f8f9fa; border: 1px solid #ccc; width: 320px; top: 45px; right: 0; z-index: 1000; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); border-radius: 8px;">
+                                <ul id="notificationList" style="list-style: none; padding: 15px; margin: 0;">
+                                    @if ($collection->isEmpty())
+                                        <li style="padding: 20px; text-align: center; color: #6c757d; font-weight: bold;">
+                                            No new notifications available
+                                        </li>
+                                    @else
+                                        @foreach ($results as $data)
+                                            <li style="margin-bottom: 10px; background-color: #fff; border: 1px solid #eee; border-radius: 5px; padding: 10px; display: flex; align-items: center;">
+                                                <span style="font-weight: bold; color: #343a40;">{{ $data->username }}</span>
+                                                <span style="margin-left: 5px; color: #495057;">has used all free towing services.</span>
+                                            </li>
+                                        @endforeach
+                                    @endif
+                                </ul>
+                            </div>
+                        @endif
+                    </li>
+                    
+                    <script>
+                        let notificationsRead = false;
+                    
+                        document.getElementById('notificationBell').addEventListener('click', function(event) {
+                            event.preventDefault();
+                            var dropdown = document.getElementById('notificationDropdown');
+                    
+                            // Toggle the dropdown display
+                            dropdown.style.display = (dropdown.style.display === 'none' || dropdown.style.display === '') ?
+                                'block' : 'none';
+                            if (!notificationsRead && dropdown.style.display === 'block') {
+                                fetch("{{ route('notifications.update') }}", {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({ update: true })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        document.getElementById('notificationCount').textContent = '0';
+                                        notificationsRead = true; 
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                });
+                            } else if (notificationsRead && dropdown.style.display === 'block') {
+
+                                var notificationList = document.getElementById('notificationList');
+                                notificationList.innerHTML = '<li style="padding: 20px; text-align: center; color: #6c757d; font-weight: bold;">No new notifications available</li>';
+                            }
+                        });
+                    
+                        // Close the dropdown if the user clicks outside of it
+                        document.addEventListener('click', function(event) {
+                            var dropdown = document.getElementById('notificationDropdown');
+                            var bell = document.getElementById('notificationBell');
+                            if (!dropdown.contains(event.target) && !bell.contains(event.target)) {
+                                dropdown.style.display = 'none';
+                            }
+                        });
+                    </script>
 
                             @can('index', \App\Models\Asset::class)
                                 <li aria-hidden="true"
@@ -762,6 +856,13 @@
                                 </ul>
                             </li>
                         @endcan
+                        @canany(['admin', 'towing_requests.view'])
+                            <li {!! (Request::is('towing_requests*') ? ' class="active"' : '') !!} class="firstnav">
+                                <a href="{{ route('towing_requests')}}">
+                                    <i class="fa fa-car"></i><span>Towing Requests</span>
+                                </a>
+                            </li>
+                        @endcanany
                         {{-- @canany(['admin','view'], \App\Models\Fine::class)
                             <li {!! (Request::is('fines*') ? ' class="active"' : '') !!} class="firstnav">
                                 <a href="{{ route('fines')}}">

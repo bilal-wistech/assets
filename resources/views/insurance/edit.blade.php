@@ -17,6 +17,13 @@ route('insurance.store'),
         {{ Form::select('asset_id', [''=>'Select']+ $assets ,$item->asset_id, ['id' => 'asset_id', 'class' => 'form-control serchable']) }}
     </div>
 </div>
+<div class="form-group ">
+    <label for="recovery_number" class="col-md-3 control-label">Recovery Number</label>
+    <div class="col-md-6 col-sm-12">
+        {{ Form::text('recovery_number', $item->recovery_number, ['class' => 'form-control', 'placeholder' => 'Enter Recovery Phone Number', 'required']) }}
+    </div>
+</div>
+
 
 <div class="form-group ">
     <label for="vendor_id" class="col-md-3 control-label">{{ trans('general.vendor_id') }}</label>

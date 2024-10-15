@@ -24,7 +24,7 @@ class REgridTransformer
     public function transform($expData_value)
     {
 
-        //  dd($expData_value);
+        // dd($expData_value);
 
         if ($expData_value) {
 
@@ -37,7 +37,7 @@ class REgridTransformer
                     'amount' => $expData_value->amount,
                     'created_at' => Helper::getFormattedDateObject($expData_value->created_at, 'datetime'),
                     'updated_at' => Helper::getFormattedDateObject($expData_value->updated_at, 'datetime'),
-                    'approve' =>  '<a class="btn btn-sm bg-blue" href="' . url("approve/" . $expData_value->id) . '" >Approve</a>',
+                    'approve' =>  '<button class="btn btn-sm bg-blue approve-btn" data-id="' . $expData_value->id . '">Approve</button>',
                 ];
             } else {
                 $array = [
@@ -48,7 +48,7 @@ class REgridTransformer
                     'amount' => $expData_value->amount,
                     'created_at' => Helper::getFormattedDateObject($expData_value->created_at, 'datetime'),
                     'updated_at' => Helper::getFormattedDateObject($expData_value->updated_at, 'datetime'),
-                    'disapprove' =>  '<a class="btn btn-sm bg-red" href="' . url("disapprove/" . $expData_value->id) . '" >Disapprove</a>',
+                    'disapprove' =>  '<button class="btn btn-sm bg-red disapprove-btn" data-id="' . $expData_value->id . '">Disapprove</button>',
                 ];
             }
 

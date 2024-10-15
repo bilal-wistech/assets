@@ -596,7 +596,7 @@
                   <th class="col-md-1">{{ trans('admin/groups/titles.deny') }}</th>
                   <th class="col-md-1">{{ trans('admin/users/table.inherit') }}</th>
                 </tr>
-              </thead>
+            </thead>
                 @include('partials.forms.edit.permissions-base')
             </table>
           </div><!-- /.tab-pane -->
