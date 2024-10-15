@@ -1,33 +1,324 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-
+use Exception;
+use App\Models\User;
 use App\Helpers\Helper;
-use App\Http\Requests\ImageUploadRequest;
-use App\Http\Controllers\Controller;
-use App\Http\Transformers\LocationsTransformer;
-use App\Http\Transformers\SelectlistTransformer;
 use App\Models\Location;
+use App\Models\Insurance;
+use App\Models\BikeQuestion;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
+use App\Models\TowingRequest;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\ImageUploadRequest;
+use Illuminate\Validation\ValidationException;
+use App\Http\Transformers\LocationsTransformer;
+use Illuminate\Pagination\LengthAwarePaginator;
+use App\Http\Transformers\SelectlistTransformer;
 
 class LocationsController extends Controller
 {
-    /**
+    /** 
      * Display a listing of the resource.
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @since [v4.0]
      * @return \Illuminate\Http\Response
      */
+
+
+    public function updateProfile(Request $request, $id)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+        $validatedData = $request->validate([
+            'username' => 'nullable|string|max:255',
+            'email' => 'nullable|string|max:255',
+            'first_name' => 'nullable|string|max:255',
+            'last_name' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:20',
+            'avatar' => 'nullable|image|max:2048',
+            'id_card_front' => 'nullable|image|max:2048',
+            'id_card_back' => 'nullable|image|max:2048',
+            'driving_license_local' => 'nullable|image|max:2048',
+            'driving_license_international' => 'nullable|image|max:2048',
+            'maltese_driving_license' => 'nullable|image|max:2048',
+            'taxi_tag' => 'nullable|image|max:2048',
+        ]);
+        if ($request->hasFile('avatar')) {
+            app(ImageUploadRequest::class)->handleImages($user, 600, 'avatar', 'avatars', 'avatar');
+        }
+        $documents = ['id_card_front', 'id_card_back', 'driving_license_local', 'driving_license_international', 'maltese_driving_license', 'taxi_tag'];
+        foreach ($documents as $doc) {
+            if ($request->hasFile($doc)) {
+                $filePath = $request->file($doc)->store("user_documents/{$doc}", 'public');
+                $validatedData[$doc] = $filePath;
+            }
+        }
+        $user->update($validatedData);
+
+        return response()->json([
+            'message' => 'User updated successfully!',
+            'user' => $user
+        ], 200);
+    }
+
+
+    public function storetowingdata(Request $request)
+    {
+        try {
+
+            $validated = $request->validate([
+                'asset_id' => 'required|integer',
+                'location' => 'required|string|max:255',
+                'user_id' => 'required|integer',
+                'reason' => 'required|string|max:255',
+                'towing_date' => 'required|date',
+            ]);
+            $towingRequest = TowingRequest::create([
+                'asset_id' => $validated['asset_id'],
+                'location' => $validated['location'],
+                'user_id' => $validated['user_id'],
+                'reason' => $validated['reason'],
+                'towing_date' => $validated['towing_date'],
+            ]);
+            $insurance = Insurance::where('asset_id', $validated['asset_id'])->first();
+
+            if ($insurance) {
+
+                if ($insurance->towingsavailable > 0) {
+                    $insurance->towingsavailable -= 1;
+
+
+                    if ($insurance->towingsavailable == 0) {
+                        $insurance->notification = 1;
+                    }
+                } else {
+
+                    $insurance->paidtowings += 1;
+
+                }
+                $insurance->save();
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No insurance record found for the provided asset',
+                ], 404);
+            }
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Towing request created successfully',
+                'data' => $towingRequest,
+            ], 201);
+
+        } catch (ValidationException $e) {
+            // Handle validation errors
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Error',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Exception $e) {
+
+            // Return server error response
+            return response()->json([
+                'status' => false,
+                'message' => 'An unexpected error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function failedtowingdata(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'asset_id' => 'required|integer',
+                'user_id' => 'required|integer',
+            ]);
+            $towingRequest = TowingRequest::where('user_id', $validated['user_id'])
+                ->where('asset_id', $validated['asset_id'])
+                ->first();
+            if ($towingRequest) {
+                $towingRequest->update([
+                    'failed_reason' => $request->input('failed_reason'),
+                ]);
+                DB::table('towings_requests')
+                    ->where('asset_id', $validated['asset_id'])
+                    ->where('user_id', $validated['user_id'])
+                    ->update(['failed_towing' => 1]);
+            } else {
+                return response()->json([
+                    'error' => 'No record found against Asset ID: ' . $validated['asset_id'] . ' and User ID: ' . $validated['user_id']
+                ], 404);
+            }
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Towing Failed Reason  Added successfully',
+                'data' => $towingRequest,
+            ], 201);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation Error',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => false,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+
+    public function getUserPhone($asset_id = null)
+    {
+
+        if (!$asset_id) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Asset ID is required.',
+            ], 400);
+        }
+
+
+        $insuranceRecord = DB::table('insurance')
+            ->where('asset_id', $asset_id)
+            ->select('recovery_number', 'towingsavailable')
+            ->first();
+
+        if ($insuranceRecord) {
+            return response()->json([
+                'status' => 'success',
+                'recovery_number' => $insuranceRecord->recovery_number,
+                'towingsavailable' => $insuranceRecord->towingsavailable, // Include towingsavailable
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No record found for the provided asset_id',
+            ], 404);
+        }
+    }
+
+    public function getUserProfileData($user_id = null)
+    {
+
+        if (!$user_id) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'User ID is required.',
+            ], 400);
+        }
+
+
+        $users_data = DB::table('users')
+            ->select(
+                'id',
+                'username',
+                'email',
+                'first_name',
+                'last_name',
+                'phone',
+                'avatar',
+                'id_card_front',
+                'id_card_back',
+                'driving_license_local',
+                'driving_license_international',
+                'maltese_driving_license',
+                'taxi_tag'
+            )
+            ->where('id', $user_id)
+            ->first();
+
+        if ($users_data) {
+            return response()->json([
+                'status' => 'success',
+                'users_data' => $users_data,
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No record found for the provided asset_id',
+            ], 404);
+        }
+    }
+
+    public function getSingleUserData($user_id = null)
+    {
+
+        if (!$user_id) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'User ID is required.',
+            ], 400);
+        }
+
+
+        $user_record = DB::table('towings_requests as tr')
+            ->leftJoin('assets as a', 'tr.asset_id', '=', 'a.id')
+            ->leftJoin('users as u', 'tr.user_id', '=', 'u.id')
+            ->select('tr.*', 'a.asset_tag as asset_name', 'u.username as username')
+            ->where('tr.user_id', $user_id)
+            ->get();
+
+        if ($user_record) {
+            return response()->json([
+                'status' => 'success',
+                'user_record' => $user_record,
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No record found for the provided user_id',
+            ], 404);
+        }
+    }
+
+
+    public function GetQuestionsLists()
+    {
+        $locations = BikeQuestion::all();
+        return response()->json($locations);
+    }
+    public function GetLocationsLists()
+    {
+        $locations = Location::all();
+        return response()->json($locations);
+    }
     public function index(Request $request)
     {
+
         $this->authorize('view', Location::class);
         $allowed_columns = [
-            'id', 'name', 'address', 'address2', 'city', 'state', 'country', 'zip', 'created_at',
-            'updated_at', 'manager_id', 'image',
-            'assigned_assets_count', 'users_count', 'assets_count','assigned_assets_count', 'assets_count', 'rtd_assets_count', 'currency', 'ldap_ou', ];
+            'id',
+            'name',
+            'address',
+            'address2',
+            'city',
+            'state',
+            'country',
+            'zip',
+            'created_at',
+            'updated_at',
+            'manager_id',
+            'image',
+            'assigned_assets_count',
+            'users_count',
+            'assets_count',
+            'assigned_assets_count',
+            'assets_count',
+            'rtd_assets_count',
+            'currency',
+            'ldap_ou',
+        ];
 
         $locations = Location::with('parent', 'manager', 'children')->select([
             'locations.id',
@@ -210,9 +501,9 @@ class LocationsController extends Controller
     {
         $this->authorize('delete', Location::class);
         $location = Location::findOrFail($id);
-        if (! $location->isDeletable()) {
+        if (!$location->isDeletable()) {
             return response()
-                    ->json(Helper::formatStandardApiResponse('error', null, trans('admin/companies/message.assoc_users')));
+                ->json(Helper::formatStandardApiResponse('error', null, trans('admin/companies/message.assoc_users')));
         }
         $this->authorize('delete', $location);
         $location->delete();
@@ -266,7 +557,7 @@ class LocationsController extends Controller
         }
 
         if ($request->filled('search')) {
-            $locations = $locations->where('locations.name', 'LIKE', '%'.$request->input('search').'%');
+            $locations = $locations->where('locations.name', 'LIKE', '%' . $request->input('search') . '%');
         }
 
         $locations = $locations->orderBy('name', 'ASC')->get();
@@ -274,7 +565,7 @@ class LocationsController extends Controller
         $locations_with_children = [];
 
         foreach ($locations as $location) {
-            if (! array_key_exists($location->parent_id, $locations_with_children)) {
+            if (!array_key_exists($location->parent_id, $locations_with_children)) {
                 $locations_with_children[$location->parent_id] = [];
             }
             $locations_with_children[$location->parent_id][] = $location;

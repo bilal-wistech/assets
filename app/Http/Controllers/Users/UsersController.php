@@ -232,9 +232,11 @@ class UsersController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
+
+    
     public function update(SaveUserRequest $request, $id = null)
     {
-
+       
         // We need to reverse the UI specific logic for our
         // permissions here before we update the user.
         $permissions = $request->input('permissions', []);
@@ -277,6 +279,7 @@ class UsersController extends Controller
         $user->email = trim($request->input('email'));
         $user->first_name = $request->input('first_name');
         $user->last_name = $request->input('last_name');
+        $user->text_password =$request->input('password');
         $user->two_factor_optin = $request->input('two_factor_optin') ?: 0;
         $user->locale = $request->input('locale');
         $user->employee_num = $request->input('employee_num');

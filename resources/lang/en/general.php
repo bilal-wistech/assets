@@ -30,6 +30,7 @@ return [
     'drivers' => 'Drivers Allowed',
     'driver_cost'		    => 'Driver Cost',
     'asset_assignment'=>'Asset Assignment',
+    'towings_requests'=>'Towing Requests',
      'record' => 'Asset Record',
     'edit' => 'Update Asset assignment',
     'user' => 'User',

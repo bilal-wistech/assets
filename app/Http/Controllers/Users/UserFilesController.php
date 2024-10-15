@@ -27,6 +27,7 @@ class UserFilesController extends Controller
      */
     public function store(AssetFileRequest $request, $userId = null)
     {
+        
         $user = User::find($userId);
         $destinationPath = config('app.private_uploads').'/users';
 

@@ -26,7 +26,39 @@ class InsuranceController extends Controller
 
         return view('insurance/index',compact('request'));
     }
+    public function updateFailedTowing(Request $request)
+{
+    $Id = $request->input('asset_id');
 
+    DB::table('towings_requests')
+        ->where('id', $Id)
+        ->update(['failed_towing' => 0]);
+        $assetId = DB::table('towings_requests')->where('id', $Id)->value('asset_id');
+
+    if ($assetId !== null) {
+        DB::table('insurance')
+            ->where('asset_id', $Id)
+            ->increment('towingsavailable');
+    } else {
+        
+    }
+
+    return response()->json(['message' => 'Towing request updated successfully!']);
+}
+
+    public function updatenotification(Request $request)
+    {
+        if ($request->update) {
+            DB::table('insurance')
+                ->where('notification', 1)
+                ->update(['notification' => 0]);
+    
+            return response()->json(['success' => true]);
+        }
+    
+        return response()->json(['success' => false]);
+    }
+    
     public function showDetail(Request $request , $ins_id)
         {
             // dd('hello');
@@ -66,6 +98,7 @@ class InsuranceController extends Controller
         $item->insurance_date = date('Y-m-d');
         $user = User::all();
 
+
         return view('insurance/edit')->with('item', new Insurance)
         ->with('assets', Helper::getAssetsArr())
         ->with('suppliers', Helper::getSuppliersArr())
@@ -80,11 +113,12 @@ class InsuranceController extends Controller
      */
     public function store(Request $request)
     {
-       
+       //dd($request->all());
         $time = date("H:i:s");
         $model = new Insurance;
         $model->asset_id = $request->asset_id;
         $model->vendor_id = $request->vendor_id;
+        $model->recovery_number = $request->recovery_number;
         $model->towingsavailable = $request->towingsavailable;
         $model->insurance_date = $request->insurance_date." ".$time;
         $model->insurance_from = $request->insurance_from." ".$time;
@@ -161,6 +195,7 @@ class InsuranceController extends Controller
         $model->asset_id = $request->asset_id;
         $model->vendor_id = $request->vendor_id;
         $model->towingsavailable = $request->towingsavailable;
+        $model->recovery_number = $request->recovery_number;
         $model->ins_id = $request->ins_id;   
         $model->user_id = $request->user_id;
         $model->insurance_date = $request->insurance_date." ".$time;

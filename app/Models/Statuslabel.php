@@ -74,6 +74,7 @@ class Statuslabel extends SnipeModel
     public function getStatuslabelType()
     {
         if (($this->pending == '1') && ($this->archived == '0') && ($this->deployable == '0')) {
+            
             return 'pending';
         } elseif (($this->pending == '0') && ($this->archived == '1') && ($this->deployable == '0')) {
             return 'archived';
@@ -115,6 +116,7 @@ class Statuslabel extends SnipeModel
      */
     public function scopeDeployable()
     {
+        
         return $this->where('pending', '=', 0)
             ->where('archived', '=', 0)
             ->where('deployable', '=', 1);
@@ -141,6 +143,7 @@ class Statuslabel extends SnipeModel
      */
     public static function getStatuslabelTypesForDB($type)
     {
+        
         $statustype['pending'] = 0;
         $statustype['deployable'] = 0;
         $statustype['archived'] = 0;

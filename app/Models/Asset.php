@@ -593,15 +593,25 @@ class Asset extends Depreciable
      * @return string | false
      */
     public function getImageUrl()
-    {
-        if ($this->image && ! empty($this->image)) {
-            return Storage::disk('public')->url(app('assets_upload_path').e($this->image));
-        } elseif ($this->model && ! empty($this->model->image)) {
-            return Storage::disk('public')->url(app('models_upload_path').e($this->model->image));
-        }
-
+{
+    if ($this->image && !empty($this->image)) {
+        $path = app('assets_upload_path') . e($this->image);
+    } elseif ($this->model && !empty($this->model->image)) {
+        $path = app('models_upload_path') . e($this->model->image);
+    } else {
         return false;
     }
+
+    // Get the full URL from the storage disk
+    $fullUrl = Storage::disk('public')->url($path);
+
+    // Get the base URL from your application configuration
+    $baseUrl = rtrim(config('app.url'), '/');
+
+    // Remove the base URL prefix from the full URL
+    return str_replace($baseUrl . '/', '', $fullUrl);
+}
+
 
 
     /**

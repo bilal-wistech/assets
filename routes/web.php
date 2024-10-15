@@ -51,6 +51,9 @@ Route::group(['middleware' => 'auth'], function () {
         Route::match(['post', 'get'], '/getDriverField', 'getDriverField');
     });
 
+    Route::post('/notifications/update', [InsuranceController::class, 'updatenotification'])->name('notifications.update');
+    Route::post('/approve-towing-request', [InsuranceController::class, 'updateFailedTowing']);
+
 
     //fine
     Route::get('/fines', [FineController::class, 'index'])->name('fines');

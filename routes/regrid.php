@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => 'auth'], function () {
 Route::controller(REgridController::class)->group(function () {
-    Route::get('/re_expense', 'show')->name('re_expense');
+Route::get('/re_expense', 'show')->name('re_expense');
+Route::get('/towing_requests', 'show_towing_requests')->name('towing_requests');
     Route::get(
         're_expense/export',
         [REgridController::class, 'export']
@@ -18,7 +19,7 @@ Route::controller(REgridController::class)->group(function () {
 });
 
 
-Route::get('/approve/{id}', [  App\Http\Controllers\Api\REgridController::class, 'approval'])->name('expence.approval');
-Route::get('/disapprove/{id}', [  App\Http\Controllers\Api\REgridController::class, 'disapproval'])->name('expence.disapproval');
+Route::post('/approve/{id}', [  App\Http\Controllers\Api\REgridController::class, 'approval'])->name('expence.approval');
+Route::post('/disapprove/{id}', [  App\Http\Controllers\Api\REgridController::class, 'disapproval'])->name('expence.disapproval');
 
 });

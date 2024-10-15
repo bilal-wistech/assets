@@ -474,6 +474,7 @@
 
 
 <script nonce="{{ csrf_token() }}">
+  
     // ---------------------------
     // - ASSET STATUS CHART -
     // ---------------------------
@@ -508,8 +509,16 @@
               "X-Requested-With": 'XMLHttpRequest',
               "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
           },
+          data:{
+            "total_deployed": "{{ $total_deployed_sidebar ?? '' }}"
+          },
           dataType: 'json',
           success: function (data) {
+            //console.log('Data received:', data); // Log the entire data object
+
+            // Log labels and datasets
+            // console.log('Labels:', data.labels); // Log the labels
+            // console.log('Data values:', data.datasets[0].data); // Log the values
               var myPieChart = new Chart(ctx,{
                   type   : 'pie',
                   data   : data,
