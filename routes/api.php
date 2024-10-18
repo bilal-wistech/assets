@@ -22,7 +22,7 @@ use App\Http\Controllers\Api\AccidentController;
 
 // user site
 Route::get('/user/{user_id?}', [Api\LocationsController::class, 'getUserProfileData']);
-Route::post('/users/{id}', [Api\LocationsController::class, 'updateProfile'])->middleware('api');
+Route::post('/users/{id}', [Api\LocationsController::class, 'updateProfile']);
 
 //Route::post('/userupdate/{id?}', [Api\UsersController::class, 'updateusersprofile']);
 Route::post('/towingrequest', [Api\LocationsController::class, 'storetowingdata'])->middleware('api');

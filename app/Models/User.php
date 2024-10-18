@@ -67,6 +67,22 @@ class User extends SnipeModel implements AuthenticatableContract, AuthorizableCo
         'vip',
          'fcm_token',
          'text_password',
+         'id_card_front', 
+    'id_card_back', 
+    'driving_license_local', 
+    'driving_license_international', 
+    'maltese_driving_license', 
+    'taxi_tag',
+    'expiry_date_id_card',
+    'expiry_date_driving_license_local',
+    'expiry_date_driving_license_international',
+    'expiry_date_maltese_license',
+    'expiry_date_taxi_tag',
+    'taxi_tag_back',
+    'driving_license_local_back',
+    'driving_license_international_back',
+    'maltese_driving_license_back',
+
     ];
 
     protected $casts = [
