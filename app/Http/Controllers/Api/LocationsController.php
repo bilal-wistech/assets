@@ -28,111 +28,213 @@ class LocationsController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-
-    public function updateProfile(Request $request, $id)
+ public function updateProfile(Request $request, $id)
     {
+        //dd($request->files);
         $user = User::find($id);
-
+        
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
-        $validatedData = $request->validate([
-            'username' => 'nullable|string|max:255',
-            'email' => 'nullable|string|max:255',
-            'first_name' => 'nullable|string|max:255',
-            'last_name' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'avatar' => 'nullable|image|max:2048',
-            'id_card_front' => 'nullable|image|max:2048',
-            'id_card_back' => 'nullable|image|max:2048',
-            'driving_license_local' => 'nullable|image|max:2048',
-            'driving_license_international' => 'nullable|image|max:2048',
-            'maltese_driving_license' => 'nullable|image|max:2048',
-            'taxi_tag' => 'nullable|image|max:2048',
-        ]);
-        if ($request->hasFile('avatar')) {
-            app(ImageUploadRequest::class)->handleImages($user, 600, 'avatar', 'avatars', 'avatar');
-        }
-        $documents = ['id_card_front', 'id_card_back', 'driving_license_local', 'driving_license_international', 'maltese_driving_license', 'taxi_tag'];
-        foreach ($documents as $doc) {
-            if ($request->hasFile($doc)) {
-                $filePath = $request->file($doc)->store("user_documents/{$doc}", 'public');
-                $validatedData[$doc] = $filePath;
-            }
-        }
-        $user->update($validatedData);
 
-        return response()->json([
-            'message' => 'User updated successfully!',
-            'user' => $user
-        ], 200);
+        try {
+            $validatedData = $request->validate([
+                'username' => 'nullable|string|max:255',
+                'email' => 'nullable|string|max:255',
+                'first_name' => 'nullable|string|max:255',
+                'last_name' => 'nullable|string|max:255',
+                'phone' => 'nullable|string|max:20',
+                'id_card_front' => 'nullable|image|max:2048',
+                'id_card_back' => 'nullable|image|max:2048',
+                'driving_license_local' => 'nullable|image|max:2048',
+                'driving_license_international' => 'nullable|image|max:2048',
+                'maltese_driving_license' => 'nullable|image|max:2048',
+                'taxi_tag' => 'nullable|image|max:2048',
+                'taxi_tag_back'=>'nullable|image|max:2048',
+                'driving_license_local_back'=>'nullable|image|max:2048',
+                'driving_license_international_back'=>'nullable|image|max:2048',
+                'maltese_driving_license_back'=>'nullable|image|max:2048',
+                'expiry_date_id_card' => 'nullable|date',
+                'expiry_date_taxi_tag' => 'nullable|date',
+                'expiry_date_driving_license_international' => 'nullable|date',
+                'expiry_date_driving_license_local' => 'nullable|date',
+                'expiry_date_maltese_license' => 'nullable|date',
+            ]);
+
+            // Handle avatar upload
+            if ($request->hasFile('avatar')) {
+                // es function ko check krein.
+                app(ImageUploadRequest::class)->handleImages($user, 600, 'avatar', 'avatars', 'avatar');
+            }
+
+            // Handle document uploads
+            $documents = [
+                'id_card_front',
+                'id_card_back',
+                'driving_license_local',
+                'driving_license_international',
+                'maltese_driving_license',
+                'taxi_tag',
+                'taxi_tag_back',
+                'driving_license_local_back',
+                'driving_license_international_back',
+                'maltese_driving_license_back',
+            ];
+            foreach ($documents as $field) {
+
+                if ($request->hasFile($field)) {
+                    // Upload the file and get the file path
+                    $file = $request->file($field);
+                    $file_name = time() . '-' . $file->getClientOriginalName();
+                    $file_path = "user_documents/" . $file_name;
+                    
+                    $file->move(public_path("user_documents"), $file_name);
+
+                    // $filePath = $file->storeAs('user_documents', $file->getClientOriginalName(), 'public');
+
+                    // Update the corresponding user column with the file path
+                    $user->{$field} = $file_path;
+                   
+                    $user->save();
+                }
+
+                unset($validatedData[$field]);
+            }
+
+            
+
+           
+            // Update user data
+            $user->update($validatedData);
+
+            return response()->json([
+                'message' => 'User updated successfully!',
+                'user' => $user
+            ], 200);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'An error occurred while updating the user.'], 500);
+        }
     }
 
-
-    public function storetowingdata(Request $request)
+ public function getUserProfileData($user_id = null)
     {
-        try {
 
-            $validated = $request->validate([
-                'asset_id' => 'required|integer',
-                'location' => 'required|string|max:255',
-                'user_id' => 'required|integer',
-                'reason' => 'required|string|max:255',
-                'towing_date' => 'required|date',
-            ]);
-            $towingRequest = TowingRequest::create([
-                'asset_id' => $validated['asset_id'],
-                'location' => $validated['location'],
-                'user_id' => $validated['user_id'],
-                'reason' => $validated['reason'],
-                'towing_date' => $validated['towing_date'],
-            ]);
-            $insurance = Insurance::where('asset_id', $validated['asset_id'])->first();
-
-            if ($insurance) {
-
-                if ($insurance->towingsavailable > 0) {
-                    $insurance->towingsavailable -= 1;
+        if (!$user_id) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'User ID is required.',
+            ], 400);
+        }
 
 
-                    if ($insurance->towingsavailable == 0) {
-                        $insurance->notification = 1;
-                    }
-                } else {
+        $users_data = DB::table('users')
+            ->select(
+                'id',
+                'email',
+                'expiry_date_id_card',
+                'expiry_date_taxi_tag',
+                'expiry_date_driving_license_international',
+                'expiry_date_driving_license_local',
+                'expiry_date_maltese_license',
+                'username',
+                'first_name',
+                'last_name',
+                'phone',
+                'avatar',
+                'id_card_front',
+                'id_card_back',
+                'driving_license_local',
+                'driving_license_international',
+                'maltese_driving_license',
+                'taxi_tag',
+                'taxi_tag_back',
+                'driving_license_local_back',
+                'driving_license_international_back',
+                'maltese_driving_license_back'
+            )
+            ->where('id', $user_id)
+            ->first();
 
-                    $insurance->paidtowings += 1;
-
-                }
-                $insurance->save();
-            } else {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'No insurance record found for the provided asset',
-                ], 404);
-            }
+        if ($users_data) {
             return response()->json([
                 'status' => 'success',
-                'message' => 'Towing request created successfully',
-                'data' => $towingRequest,
-            ], 201);
-
-        } catch (ValidationException $e) {
-            // Handle validation errors
+                'users_data' => $users_data,
+            ], 200);
+        } else {
             return response()->json([
-                'status' => false,
-                'message' => 'Validation Error',
-                'errors' => $e->errors(),
-            ], 422);
-        } catch (Exception $e) {
-
-            // Return server error response
-            return response()->json([
-                'status' => false,
-                'message' => 'An unexpected error occurred',
-                'error' => $e->getMessage(),
-            ], 500);
+                'status' => 'error',
+                'message' => 'No record found for the provided asset_id',
+            ], 404);
         }
     }
+
+     public function storetowingdata(Request $request)
+     {
+         try {
+     
+             $validated = $request->validate([
+                 'asset_id' => 'required|integer',
+                 'location' => 'required|string|max:255',
+                 'user_id' => 'required|integer',
+                 'reason' => 'required|string|max:255',
+                 'towing_date' => 'required|date',
+             ]);
+             $towingRequest = TowingRequest::create([
+                 'asset_id' => $validated['asset_id'],
+                 'location' => $validated['location'],
+                 'user_id' => $validated['user_id'],
+                 'reason' => $validated['reason'],
+                 'towing_date' => $validated['towing_date'],
+             ]);
+             $insurance = Insurance::where('asset_id', $validated['asset_id'])->first();
+             
+             if ($insurance) {
+                 
+                 if ($insurance->towingsavailable > 0) {
+                     $insurance->towingsavailable -= 1;
+     
+                     
+                     if ($insurance->towingsavailable == 0) {
+                         $insurance->notification = 1;
+                     }
+                 } else {
+                    
+                     $insurance->paidtowings += 1;
+                     
+                 }
+                 $insurance->save();
+             } else {
+                 return response()->json([
+                     'status' => false,
+                     'message' => 'No insurance record found for the provided asset',
+                 ], 404);
+             }
+             return response()->json([
+                 'status' => 'success',
+                 'message' => 'Towing request created successfully',
+                 'data' => $towingRequest,
+             ], 201);
+     
+         } catch (ValidationException $e) {
+             // Handle validation errors
+             return response()->json([
+                 'status' => false,
+                 'message' => 'Validation Error',
+                 'errors' => $e->errors(),
+             ], 422);
+         } catch (Exception $e) {
+             
+             // Return server error response
+             return response()->json([
+                 'status' => false,
+                 'message' => 'An unexpected error occurred',
+                 'error' => $e->getMessage(),
+             ], 500);
+         }
+     }
 
     public function failedtowingdata(Request $request)
     {
@@ -199,49 +301,6 @@ class LocationsController extends Controller
                 'status' => 'success',
                 'recovery_number' => $insuranceRecord->recovery_number,
                 'towingsavailable' => $insuranceRecord->towingsavailable, // Include towingsavailable
-            ], 200);
-        } else {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'No record found for the provided asset_id',
-            ], 404);
-        }
-    }
-
-    public function getUserProfileData($user_id = null)
-    {
-
-        if (!$user_id) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'User ID is required.',
-            ], 400);
-        }
-
-
-        $users_data = DB::table('users')
-            ->select(
-                'id',
-                'username',
-                'email',
-                'first_name',
-                'last_name',
-                'phone',
-                'avatar',
-                'id_card_front',
-                'id_card_back',
-                'driving_license_local',
-                'driving_license_international',
-                'maltese_driving_license',
-                'taxi_tag'
-            )
-            ->where('id', $user_id)
-            ->first();
-
-        if ($users_data) {
-            return response()->json([
-                'status' => 'success',
-                'users_data' => $users_data,
             ], 200);
         } else {
             return response()->json([
