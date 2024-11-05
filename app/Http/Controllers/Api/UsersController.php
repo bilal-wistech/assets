@@ -361,6 +361,7 @@ class UsersController extends Controller
 
         $tmp_pass = substr(str_shuffle('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 20);
         $user->password = bcrypt($request->get('password', $tmp_pass));
+       // $user->text_password = $request->input('password');
 
         app('App\Http\Requests\ImageUploadRequest')->handleImages($user, 600, 'image', 'avatars', 'avatar');
         
@@ -431,6 +432,7 @@ class UsersController extends Controller
 
         if ($request->filled('password')) {
             $user->password = bcrypt($request->input('password'));
+            //$user->text_password = $request->input('password');
         }
 
         // We need to use has()  instead of filled()

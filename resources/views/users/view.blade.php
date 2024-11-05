@@ -83,9 +83,9 @@
                                 <i class="far fa-file fa-2x"></i>
                             </span>
                             <span class="hidden-xs hidden-sm">
-                              {{ trans('general.file_uploads') }}
-                              @php
-                               $hasUploads =
+                                {{ trans('general.file_uploads') }}
+                                @php
+                                    $hasUploads =
                                         $user->taxi_tag_back ||
                                         $user->driving_license_local_back ||
                                         $user->driving_license_international_back ||
@@ -96,32 +96,35 @@
                                         $user->driving_license_international ||
                                         $user->maltese_driving_license ||
                                         $user->taxi_tag;
-                                  // Initialize total uploads counter
-                                  $totalUploads = 0;
-                          
-                                  // Define the conditions to count only once for each document type
-                                  if ($user->taxi_tag_back || $user->taxi_tag) {
-                                      $totalUploads++;
-                                  }
-                                  if ($user->driving_license_local_back || $user->driving_license_local) {
-                                      $totalUploads++;
-                                  }
-                                  if ($user->driving_license_international_back || $user->driving_license_international) {
-                                      $totalUploads++;
-                                  }
-                                  if ($user->maltese_driving_license_back || $user->maltese_driving_license) {
-                                      $totalUploads++;
-                                  }
-                                  if ($user->id_card_front || $user->id_card_back) {
-                                      $totalUploads++;
-                                  }
-                              @endphp
-                          
-                              {{-- Display badge based on the total count --}}
-                              <badge class="badge badge-secondary">{{ $totalUploads }}</badge>
-                          </span>
-                          
-                            
+                                    // Initialize total uploads counter
+                                    $totalUploads = 0;
+
+                                    // Define the conditions to count only once for each document type
+                                    if ($user->taxi_tag_back || $user->taxi_tag) {
+                                        $totalUploads++;
+                                    }
+                                    if ($user->driving_license_local_back || $user->driving_license_local) {
+                                        $totalUploads++;
+                                    }
+                                    if (
+                                        $user->driving_license_international_back ||
+                                        $user->driving_license_international
+                                    ) {
+                                        $totalUploads++;
+                                    }
+                                    if ($user->maltese_driving_license_back || $user->maltese_driving_license) {
+                                        $totalUploads++;
+                                    }
+                                    if ($user->id_card_front || $user->id_card_back) {
+                                        $totalUploads++;
+                                    }
+                                @endphp
+
+                                {{-- Display badge based on the total count --}}
+                                <badge class="badge badge-secondary">{{ $totalUploads }}</badge>
+                            </span>
+
+
 
                         </a>
                     </li>
@@ -918,153 +921,379 @@
 
                             <div class="col-md-12 col-sm-12">
                                 <div class="table-responsive">
-                                  <table data-cookie-id-table="userUploadsTable" data-id-table="userUploadsTable" id="userUploadsTable"
-                                  data-search="true" data-pagination="true" data-side-pagination="client" data-show-columns="true"
-                                  data-show-fullscreen="true" data-show-export="false" data-show-footer="true"
-                                  data-toolbar="#upload-toolbar" data-show-refresh="true" data-sort-order="asc"
-                                  data-sort-name="name" class="table table-striped snipe-table"
-                                  data-export-options='{
+                                    <table data-cookie-id-table="userUploadsTable" data-id-table="userUploadsTable"
+                                        id="userUploadsTable" data-search="true" data-pagination="true"
+                                        data-side-pagination="client" data-show-columns="true"
+                                        data-show-fullscreen="true" data-show-export="false" data-show-footer="true"
+                                        data-toolbar="#upload-toolbar" data-show-refresh="true" data-sort-order="asc"
+                                        data-sort-name="name" class="table table-striped snipe-table"
+                                        data-export-options='{
                                       "fileName": "export-license-uploads-{{ str_slug($user->name) }}-{{ date('Y-m-d') }}",
                                       "ignoreColumn": ["actions","image","change","checkbox","checkincheckout","delete","download","icon"]
                                   }'>
-                               <thead>
-                                   <tr>
-                                       <th class="col-md-3" data-searchable="true" data-visible="true">Document Name</th>
-                                       <th class="col-md-3" data-searchable="true" data-visible="true">Document Front</th>
-                                       <th class="col-md-3" data-searchable="true" data-visible="true">Document Back</th>
-                                       <th class="col-md-3" data-searchable="true" data-visible="true">Expiry Date</th>
-                                   </tr>
-                               </thead>
-                               <tbody>
-                                   @if ($hasUploads)
-                                   @if (!empty($user->id_card_front || $user->id_card_back) )
-                                       <tr>
-                                           <td>ID Card</td>
-                                           <td>
-                                               @if (!empty($user->id_card_front))
-                                                   <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'id_card_front', 'download' => 'false']) }}" data-toggle="lightbox" data-type="image">
-                                                       <img src="{{ asset($user->id_card_front) }}" alt="ID Card Front" class="img-thumbnail" style="max-width: 50px;">
-                                                   </a>
-                                               @else
-                                                   <i class="fa fa-times text-danger"></i> {{ trans('general.file_not_found') }}
-                                               @endif
-                                           </td>
-                                           <td>
-                                               @if (!empty($user->id_card_back))
-                                                   <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'id_card_back', 'download' => 'false']) }}" data-toggle="lightbox" data-type="image">
-                                                       <img src="{{ asset($user->id_card_back) }}" alt="ID Card Back" class="img-thumbnail" style="max-width: 50px;">
-                                                   </a>
-                                               @else
-                                                   <i class="fa fa-times text-danger"></i> {{ trans('general.file_not_found') }}
-                                               @endif
-                                           </td>
-                                           <td>{{ $user->expiry_date_id_card }}</td>
-                                       </tr>
-                                       @endif
-                                       @if (!empty($user->driving_license_local || $user->driving_license_local_back) )
-                                       <tr>
-                                           <td>Driving License Local</td>
-                                           <td>
-                                               @if (!empty($user->driving_license_local))
-                                                   <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'driving_license_local', 'download' => 'false']) }}" data-toggle="lightbox" data-type="image">
-                                                       <img src="{{ asset($user->driving_license_local) }}" alt="Driving License Local Front" class="img-thumbnail" style="max-width: 50px;">
-                                                   </a>
-                                               @else
-                                                   <i class="fa fa-times text-danger"></i> {{ trans('general.file_not_found') }}
-                                               @endif
-                                           </td>
-                                           <td>
-                                               @if (!empty($user->driving_license_local_back))
-                                                   <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'driving_license_local_back', 'download' => 'false']) }}" data-toggle="lightbox" data-type="image">
-                                                       <img src="{{ asset($user->driving_license_local_back) }}" alt="Driving License Local Back" class="img-thumbnail" style="max-width: 50px;">
-                                                   </a>
-                                               @else
-                                                   <i class="fa fa-times text-danger"></i> {{ trans('general.file_not_found') }}
-                                               @endif
-                                           </td>
-                                           <td>{{ $user->expiry_date_driving_license_local }}</td>
-                                       </tr>
-                                       @endif
-                                       @if (!empty($user->driving_license_international || $user->driving_license_international_back) )
-                                       <tr>
-                                           <td>Driving License International</td>
-                                           <td>
-                                               @if (!empty($user->driving_license_international))
-                                                   <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'driving_license_international', 'download' => 'false']) }}" data-toggle="lightbox" data-type="image">
-                                                       <img src="{{ asset($user->driving_license_international) }}" alt="Driving License International Front" class="img-thumbnail" style="max-width: 50px;">
-                                                   </a>
-                                               @else
-                                                   <i class="fa fa-times text-danger"></i> {{ trans('general.file_not_found') }}
-                                               @endif
-                                           </td>
-                                           <td>
-                                               @if (!empty($user->driving_license_international_back))
-                                                   <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'driving_license_international_back', 'download' => 'false']) }}" data-toggle="lightbox" data-type="image">
-                                                       <img src="{{ asset($user->driving_license_international_back) }}" alt="Driving License International Back" class="img-thumbnail" style="max-width: 50px;">
-                                                   </a>
-                                               @else
-                                                   <i class="fa fa-times text-danger"></i> {{ trans('general.file_not_found') }}
-                                               @endif
-                                           </td>
-                                           <td>{{ $user->expiry_date_driving_license_international }}</td>
-                                       </tr>
-                                       @endif
-                                       @if (!empty($user->maltese_driving_license || $user->maltese_driving_license_back) )
-                                       <tr>
-                                           <td>Maltese Driving License</td>
-                                           <td>
-                                               @if (!empty($user->maltese_driving_license))
-                                                   <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'maltese_driving_license', 'download' => 'false']) }}" data-toggle="lightbox" data-type="image">
-                                                       <img src="{{ asset($user->maltese_driving_license) }}" alt="Maltese Driving License Front" class="img-thumbnail" style="max-width: 50px;">
-                                                   </a>
-                                               @else
-                                                   <i class="fa fa-times text-danger"></i> {{ trans('general.file_not_found') }}
-                                               @endif
-                                           </td>
-                                           <td>
-                                               @if (!empty($user->maltese_driving_license_back))
-                                                   <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'maltese_driving_license_back', 'download' => 'false']) }}" data-toggle="lightbox" data-type="image">
-                                                       <img src="{{ asset($user->maltese_driving_license_back) }}" alt="Maltese Driving License Back" class="img-thumbnail" style="max-width: 50px;">
-                                                   </a>
-                                               @else
-                                                   <i class="fa fa-times text-danger"></i> {{ trans('general.file_not_found') }}
-                                               @endif
-                                           </td>
-                                           <td>{{ $user->expiry_date_maltese_license }}</td>
-                                       </tr>
-                                       @endif
-                                       @if (!empty($user->taxi_tag || $user->taxi_tag_back) )
-                                       <tr>
-                                           <td>Taxi Tag</td>
-                                           <td>
-                                               @if (!empty($user->taxi_tag))
-                                                   <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'taxi_tag', 'download' => 'false']) }}" data-toggle="lightbox" data-type="image">
-                                                       <img src="{{ asset($user->taxi_tag) }}" alt="Taxi Tag Front" class="img-thumbnail" style="max-width: 50px;">
-                                                   </a>
-                                               @else
-                                                   <i class="fa fa-times text-danger"></i> {{ trans('general.file_not_found') }}
-                                               @endif
-                                           </td>
-                                           <td>
-                                               @if (!empty($user->taxi_tag_back))
-                                                   <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'taxi_tag_back', 'download' => 'false']) }}" data-toggle="lightbox" data-type="image">
-                                                       <img src="{{ asset($user->taxi_tag_back) }}" alt="Taxi Tag Back" class="img-thumbnail" style="max-width: 50px;">
-                                                   </a>
-                                               @else
-                                                   <i class="fa fa-times text-danger"></i> {{ trans('general.file_not_found') }}
-                                               @endif
-                                           </td>
-                                           <td>{{ $user->expiry_date_taxi_tag }}</td>
-                                       </tr>
-                                       @endif
-                                   @else
-                                       <tr>
-                                           <td colspan="4" class="text-center">No matching Record Found</td>
-                                       </tr>
-                                   @endif
-                               </tbody>
-                           </table>
-                           
+                                        <thead>
+                                            <tr>
+                                                <th class="col-md-3" data-searchable="true" data-visible="true">Document
+                                                    Name</th>
+                                                <th class="col-md-3" data-searchable="true" data-visible="true">Document
+                                                    Front</th>
+                                                <th class="col-md-3" data-searchable="true" data-visible="true">Document
+                                                    Back</th>
+                                                <th class="col-md-3" data-searchable="true" data-visible="true">Expiry
+                                                    Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if ($hasUploads)
+                                                @if (!empty($user->id_card_front || $user->id_card_back))
+                                                    <tr>
+                                                        <td>ID Card</td>
+                                                        <td>
+                                                            @if (!empty($user->id_card_front))
+                                                                @php
+                                                                    $fileExtension = pathinfo(
+                                                                        $user->id_card_front,
+                                                                        PATHINFO_EXTENSION,
+                                                                    );
+                                                                @endphp
+
+                                                                @if (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg']))
+                                                                    <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'id_card_front', 'download' => 'false']) }}"
+                                                                        data-toggle="lightbox" data-type="image">
+                                                                        <img src="{{ asset($user->id_card_front) }}"
+                                                                            alt="ID Card Front" class="img-thumbnail"
+                                                                            style="max-width: 50px;">
+                                                                    </a>
+                                                                @elseif ($fileExtension === 'pdf')
+                                                                    <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'id_card_front', 'download' => 'false']) }}"
+                                                                        target="_blank">
+                                                                        <i class="fa fa-file-pdf"
+                                                                            style="font-size: 24px; color: red;"></i>
+                                                                    </a>
+                                                                @else
+                                                                    <i class="fa fa-times text-danger"></i>
+                                                                    {{ trans('general.file_not_supported') }}
+                                                                @endif
+                                                            @else
+                                                                <i class="fa fa-times text-danger"></i>
+                                                                {{ trans('general.file_not_found') }}
+                                                            @endif
+                                                        </td>
+
+                                                        <td>
+                                                            @if (!empty($user->id_card_back))
+                                                                @php
+                                                                    $fileExtension = pathinfo(
+                                                                        $user->id_card_back,
+                                                                        PATHINFO_EXTENSION,
+                                                                    );
+                                                                @endphp
+
+                                                                @if (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg']))
+                                                                    <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'id_card_back', 'download' => 'false']) }}"
+                                                                        data-toggle="lightbox" data-type="image">
+                                                                        <img src="{{ asset($user->id_card_back) }}"
+                                                                            alt="ID Card Front" class="img-thumbnail"
+                                                                            style="max-width: 50px;">
+                                                                    </a>
+                                                                @elseif ($fileExtension === 'pdf')
+                                                                    <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'id_card_back', 'download' => 'false']) }}"
+                                                                        target="_blank">
+                                                                        <i class="fa fa-file-pdf"
+                                                                            style="font-size: 24px; color: red;"></i>
+                                                                    </a>
+                                                                @else
+                                                                    <i class="fa fa-times text-danger"></i>
+                                                                    {{ trans('general.file_not_supported') }}
+                                                                @endif
+                                                            @else
+                                                                <i class="fa fa-times text-danger"></i>
+                                                                {{ trans('general.file_not_found') }}
+                                                            @endif
+                                                        </td>
+                                                        <td>{{ $user->expiry_date_id_card }}</td>
+                                                    </tr>
+                                                @endif
+                                                @if (!empty($user->driving_license_local || $user->driving_license_local_back))
+                                                    <tr>
+                                                        <td>Driving License Local</td>
+                                                        <td>
+                                                            @if (!empty($user->driving_license_local))
+                                                                @php
+                                                                    $fileExtension = pathinfo(
+                                                                        $user->driving_license_local,
+                                                                        PATHINFO_EXTENSION,
+                                                                    );
+                                                                @endphp
+
+                                                                @if (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg']))
+                                                                    <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'driving_license_local', 'download' => 'false']) }}"
+                                                                        data-toggle="lightbox" data-type="image">
+                                                                        <img src="{{ asset($user->driving_license_local) }}"
+                                                                            alt="ID Card Front" class="img-thumbnail"
+                                                                            style="max-width: 50px;">
+                                                                    </a>
+                                                                @elseif ($fileExtension === 'pdf')
+                                                                    <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'driving_license_local', 'download' => 'false']) }}"
+                                                                        target="_blank">
+                                                                        <i class="fa fa-file-pdf"
+                                                                            style="font-size: 24px; color: red;"></i>
+                                                                    </a>
+                                                                @else
+                                                                    <i class="fa fa-times text-danger"></i>
+                                                                    {{ trans('general.file_not_supported') }}
+                                                                @endif
+                                                            @else
+                                                                <i class="fa fa-times text-danger"></i>
+                                                                {{ trans('general.file_not_found') }}
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            @if (!empty($user->driving_license_local_back))
+                                                                @php
+                                                                    $fileExtension = pathinfo(
+                                                                        $user->driving_license_local_back,
+                                                                        PATHINFO_EXTENSION,
+                                                                    );
+                                                                @endphp
+
+                                                                @if (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg']))
+                                                                    <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'driving_license_local_back', 'download' => 'false']) }}"
+                                                                        data-toggle="lightbox" data-type="image">
+                                                                        <img src="{{ asset($user->driving_license_local_back) }}"
+                                                                            alt="ID Card Front" class="img-thumbnail"
+                                                                            style="max-width: 50px;">
+                                                                    </a>
+                                                                @elseif ($fileExtension === 'pdf')
+                                                                    <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'driving_license_local_back', 'download' => 'false']) }}"
+                                                                        target="_blank">
+                                                                        <i class="fa fa-file-pdf"
+                                                                            style="font-size: 24px; color: red;"></i>
+                                                                    </a>
+                                                                @else
+                                                                    <i class="fa fa-times text-danger"></i>
+                                                                    {{ trans('general.file_not_supported') }}
+                                                                @endif
+                                                            @else
+                                                                <i class="fa fa-times text-danger"></i>
+                                                                {{ trans('general.file_not_found') }}
+                                                            @endif
+                                                        </td>
+                                                        <td>{{ $user->expiry_date_driving_license_local }}</td>
+                                                    </tr>
+                                                @endif
+                                                @if (!empty($user->driving_license_international || $user->driving_license_international_back))
+                                                    <tr>
+                                                        <td>Driving License International</td>
+                                                        <td>
+                                                            @if (!empty($user->driving_license_international))
+                                                                @php
+                                                                    $fileExtension = pathinfo(
+                                                                        $user->driving_license_international,
+                                                                        PATHINFO_EXTENSION,
+                                                                    );
+                                                                @endphp
+
+                                                                @if (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg']))
+                                                                    <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'driving_license_international', 'download' => 'false']) }}"
+                                                                        data-toggle="lightbox" data-type="image">
+                                                                        <img src="{{ asset($user->driving_license_international) }}"
+                                                                            alt="ID Card Front" class="img-thumbnail"
+                                                                            style="max-width: 50px;">
+                                                                    </a>
+                                                                @elseif ($fileExtension === 'pdf')
+                                                                    <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'driving_license_international', 'download' => 'false']) }}"
+                                                                        target="_blank">
+                                                                        <i class="fa fa-file-pdf"
+                                                                            style="font-size: 24px; color: red;"></i>
+                                                                    </a>
+                                                                @else
+                                                                    <i class="fa fa-times text-danger"></i>
+                                                                    {{ trans('general.file_not_supported') }}
+                                                                @endif
+                                                            @else
+                                                                <i class="fa fa-times text-danger"></i>
+                                                                {{ trans('general.file_not_found') }}
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            @if (!empty($user->driving_license_international_back))
+                                                                @php
+                                                                    $fileExtension = pathinfo(
+                                                                        $user->driving_license_international_back,
+                                                                        PATHINFO_EXTENSION,
+                                                                    );
+                                                                @endphp
+
+                                                                @if (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg']))
+                                                                    <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'driving_license_international_back', 'download' => 'false']) }}"
+                                                                        data-toggle="lightbox" data-type="image">
+                                                                        <img src="{{ asset($user->driving_license_international_back) }}"
+                                                                            alt="ID Card Front" class="img-thumbnail"
+                                                                            style="max-width: 50px;">
+                                                                    </a>
+                                                                @elseif ($fileExtension === 'pdf')
+                                                                    <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'driving_license_international_back', 'download' => 'false']) }}"
+                                                                        target="_blank">
+                                                                        <i class="fa fa-file-pdf"
+                                                                            style="font-size: 24px; color: red;"></i>
+                                                                    </a>
+                                                                @else
+                                                                    <i class="fa fa-times text-danger"></i>
+                                                                    {{ trans('general.file_not_supported') }}
+                                                                @endif
+                                                            @else
+                                                                <i class="fa fa-times text-danger"></i>
+                                                                {{ trans('general.file_not_found') }}
+                                                            @endif
+                                                        </td>
+                                                        <td>{{ $user->expiry_date_driving_license_international }}</td>
+                                                    </tr>
+                                                @endif
+                                                @if (!empty($user->maltese_driving_license || $user->maltese_driving_license_back))
+                                                    <tr>
+                                                        <td>Maltese Driving License</td>
+                                                        <td>
+                                                            @if (!empty($user->maltese_driving_license))
+                                                                @php
+                                                                    $fileExtension = pathinfo(
+                                                                        $user->maltese_driving_license,
+                                                                        PATHINFO_EXTENSION,
+                                                                    );
+                                                                @endphp
+
+                                                                @if (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg']))
+                                                                    <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'maltese_driving_license', 'download' => 'false']) }}"
+                                                                        data-toggle="lightbox" data-type="image">
+                                                                        <img src="{{ asset($user->maltese_driving_license) }}"
+                                                                            alt="ID Card Front" class="img-thumbnail"
+                                                                            style="max-width: 50px;">
+                                                                    </a>
+                                                                @elseif ($fileExtension === 'pdf')
+                                                                    <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'maltese_driving_license', 'download' => 'false']) }}"
+                                                                        target="_blank">
+                                                                        <i class="fa fa-file-pdf"
+                                                                            style="font-size: 24px; color: red;"></i>
+                                                                    </a>
+                                                                @else
+                                                                    <i class="fa fa-times text-danger"></i>
+                                                                    {{ trans('general.file_not_supported') }}
+                                                                @endif
+                                                            @else
+                                                                <i class="fa fa-times text-danger"></i>
+                                                                {{ trans('general.file_not_found') }}
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            @if (!empty($user->maltese_driving_license_back))
+                                                                @php
+                                                                    $fileExtension = pathinfo(
+                                                                        $user->maltese_driving_license_back,
+                                                                        PATHINFO_EXTENSION,
+                                                                    );
+                                                                @endphp
+
+                                                                @if (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg']))
+                                                                    <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'maltese_driving_license_back', 'download' => 'false']) }}"
+                                                                        data-toggle="lightbox" data-type="image">
+                                                                        <img src="{{ asset($user->maltese_driving_license_back) }}"
+                                                                            alt="ID Card Front" class="img-thumbnail"
+                                                                            style="max-width: 50px;">
+                                                                    </a>
+                                                                @elseif ($fileExtension === 'pdf')
+                                                                    <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'maltese_driving_license_back', 'download' => 'false']) }}"
+                                                                        target="_blank">
+                                                                        <i class="fa fa-file-pdf"
+                                                                            style="font-size: 24px; color: red;"></i>
+                                                                    </a>
+                                                                @else
+                                                                    <i class="fa fa-times text-danger"></i>
+                                                                    {{ trans('general.file_not_supported') }}
+                                                                @endif
+                                                            @else
+                                                                <i class="fa fa-times text-danger"></i>
+                                                                {{ trans('general.file_not_found') }}
+                                                            @endif
+                                                        </td>
+                                                        <td>{{ $user->expiry_date_maltese_license }}</td>
+                                                    </tr>
+                                                @endif
+                                                @if (!empty($user->taxi_tag || $user->taxi_tag_back))
+                                                    <tr>
+                                                        <td>Taxi Tag</td>
+                                                        <td>
+                                                            @if (!empty($user->taxi_tag))
+                                                                @php
+                                                                    $fileExtension = pathinfo(
+                                                                        $user->taxi_tag,
+                                                                        PATHINFO_EXTENSION,
+                                                                    );
+                                                                @endphp
+
+                                                                @if (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg']))
+                                                                    <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'taxi_tag', 'download' => 'false']) }}"
+                                                                        data-toggle="lightbox" data-type="image">
+                                                                        <img src="{{ asset($user->taxi_tag) }}"
+                                                                            alt="ID Card Front" class="img-thumbnail"
+                                                                            style="max-width: 50px;">
+                                                                    </a>
+                                                                @elseif ($fileExtension === 'pdf')
+                                                                    <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'taxi_tag', 'download' => 'false']) }}"
+                                                                        target="_blank">
+                                                                        <i class="fa fa-file-pdf"
+                                                                            style="font-size: 24px; color: red;"></i>
+                                                                    </a>
+                                                                @else
+                                                                    <i class="fa fa-times text-danger"></i>
+                                                                    {{ trans('general.file_not_supported') }}
+                                                                @endif
+                                                            @else
+                                                                <i class="fa fa-times text-danger"></i>
+                                                                {{ trans('general.file_not_found') }}
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            @if (!empty($user->taxi_tag_back))
+                                                                @php
+                                                                    $fileExtension = pathinfo(
+                                                                        $user->taxi_tag_back,
+                                                                        PATHINFO_EXTENSION,
+                                                                    );
+                                                                @endphp
+
+                                                                @if (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg']))
+                                                                    <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'taxi_tag_back', 'download' => 'false']) }}"
+                                                                        data-toggle="lightbox" data-type="image">
+                                                                        <img src="{{ asset($user->taxi_tag_back) }}"
+                                                                            alt="ID Card Front" class="img-thumbnail"
+                                                                            style="max-width: 50px;">
+                                                                    </a>
+                                                                @elseif ($fileExtension === 'pdf')
+                                                                    <a href="{{ route('show/userfile', ['userId' => $user->id, 'fileId' => 'taxi_tag_back', 'download' => 'false']) }}"
+                                                                        target="_blank">
+                                                                        <i class="fa fa-file-pdf"
+                                                                            style="font-size: 24px; color: red;"></i>
+                                                                    </a>
+                                                                @else
+                                                                    <i class="fa fa-times text-danger"></i>
+                                                                    {{ trans('general.file_not_supported') }}
+                                                                @endif
+                                                            @else
+                                                                <i class="fa fa-times text-danger"></i>
+                                                                {{ trans('general.file_not_found') }}
+                                                            @endif
+                                                        </td>
+                                                        <td>{{ $user->expiry_date_taxi_tag }}</td>
+                                                    </tr>
+                                                @endif
+                                            @else
+                                                <tr>
+                                                    <td colspan="4" class="text-center">No matching Record Found</td>
+                                                </tr>
+                                            @endif
+                                        </tbody>
+                                    </table>
+
                                 </div>
                             </div>
                         </div> <!--/ROW-->
@@ -1243,6 +1472,72 @@
 
                 }
             });
+        });
+        $(document).ready(function() {
+            $('#document_type').on('change', function() {
+                var documentType = $(this).val();
+                $('.id_card_fields, .driving_license_local_fields, .driving_license_maltese_fields, .driving_license_international_fields, .taxi_tag_fields')
+                    .hide();
+                if (documentType === 'id_card') {
+                    $('.id_card_fields').show();
+                } else if (documentType === 'driving_license_local') {
+                    $('.driving_license_local_fields').show();
+                } else if (documentType === 'maltese_license') {
+                    $('.driving_license_maltese_fields').show();
+                } else if (documentType === 'driving_license_international') {
+                    $('.driving_license_international_fields').show();
+                } else if (documentType === 'taxi_tag') {
+                    $('.taxi_tag_fields').show();
+                }
+            });
+            $('.form-horizontal').on('submit', function(e) {
+    var documentType = $('#document_type').val();
+    var frontFile = false;
+    var backFile = false;
+    var acceptedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'pdf'];
+    
+    function validateFileType(fileInput) {
+        var filePath = $(fileInput).val();
+        if (filePath) {
+            var fileExtension = filePath.split('.').pop().toLowerCase();
+            return acceptedExtensions.includes(fileExtension);
+        }
+        return true; // No file means no error for type
+    }
+
+    if (documentType === 'id_card') {
+        frontFile = $('input[name="id_card_front"]').val() !== '';
+        backFile = $('input[name="id_card_back"]').val() !== '';
+    } else if (documentType === 'driving_license_local') {
+        frontFile = $('input[name="driving_license_local"]').val() !== '';
+        backFile = $('input[name="driving_license_local_back"]').val() !== '';
+    } else if (documentType === 'maltese_license') {
+        frontFile = $('input[name="maltese_driving_license"]').val() !== '';
+        backFile = $('input[name="maltese_driving_license_back"]').val() !== '';
+    } else if (documentType === 'driving_license_international') {
+        frontFile = $('input[name="driving_license_international"]').val() !== '';
+        backFile = $('input[name="driving_license_international_back"]').val() !== '';
+    } else if (documentType === 'taxi_tag') {
+        frontFile = $('input[name="taxi_tag"]').val() !== '';
+        backFile = $('input[name="taxi_tag_back"]').val() !== '';
+    }
+
+    // Check if at least one file (front or back) is uploaded
+    if (!frontFile && !backFile) {
+        alert('At least one document (front or back) must be uploaded.');
+        e.preventDefault(); // Prevent form submission
+    } else {
+        // Check the file type validity for both front and back files
+        var isFrontFileValid = frontFile ? validateFileType($('input[name="' + documentType + '_front"]')) : true;
+        var isBackFileValid = backFile ? validateFileType($('input[name="' + documentType + '_back"]')) : true;
+
+        if (!isFrontFileValid || !isBackFileValid) {
+            alert('Please upload only files with these extensions: jpg, jpeg, png, gif, bmp, webp, svg, pdf.');
+            e.preventDefault(); // Prevent form submission if file type is invalid
+        }
+    }
+});
+
         });
     </script>
 
