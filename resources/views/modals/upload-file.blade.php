@@ -1,5 +1,3 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <!-- Modal -->
 <div class="modal fade" id="uploadFileModal" tabindex="-1" role="dialog" aria-labelledby="uploadFileModalLabel"
     aria-hidden="true">
@@ -73,7 +71,7 @@
                     </div>
                 </div>
                 <br> --}}
-               
+
                 <!-- Document Type -->
 
                 <div class="row">
@@ -256,9 +254,9 @@
                     </div>
                 </div>
 
-                
 
-                
+
+
 
 
                 <!-- /.modal-body -->
@@ -272,53 +270,3 @@
 
         </div>
     </div>
-    <script>
-        $(document).ready(function() {
-    $('#document_type').on('change', function() {
-        var documentType = $(this).val();
-        $('.id_card_fields, .driving_license_local_fields, .driving_license_maltese_fields, .driving_license_international_fields, .taxi_tag_fields')
-            .hide(); // Hide all fields initially
-
-        if (documentType === 'id_card') {
-            $('.id_card_fields').show();
-        } else if (documentType === 'driving_license_local') {
-            $('.driving_license_local_fields').show();
-        } else if (documentType === 'maltese_license') {
-            $('.driving_license_maltese_fields').show();
-        } else if (documentType === 'driving_license_international') {
-            $('.driving_license_international_fields').show();
-        } else if (documentType === 'taxi_tag') {
-            $('.taxi_tag_fields').show();
-        }
-    });
-
-    $('form').on('submit', function(e) {
-        var documentType = $('#document_type').val();
-        var frontFile = false;
-        var backFile = false;
-
-        if (documentType === 'id_card') {
-            frontFile = $('input[name="id_card_front"]').val() !== '';
-            backFile = $('input[name="id_card_back"]').val() !== '';
-        } else if (documentType === 'driving_license_local') {
-            frontFile = $('input[name="driving_license_local"]').val() !== '';
-            backFile = $('input[name="driving_license_local_back"]').val() !== '';
-        } else if (documentType === 'maltese_license') {
-            frontFile = $('input[name="maltese_driving_license"]').val() !== '';
-    backFile = $('input[name="maltese_driving_license_back"]').val() !== '';
-        } else if (documentType === 'driving_license_international') {
-            frontFile = $('input[name="driving_license_international"]').val() !== '';
-            backFile = $('input[name="driving_license_international_back"]').val() !== '';
-        } else if (documentType === 'taxi_tag') {
-            frontFile = $('input[name="taxi_tag"]').val() !== '';
-            backFile = $('input[name="taxi_tag_back"]').val() !== '';
-        }
-
-        if (!frontFile && !backFile) {
-            alert('At least one document (front or back) must be uploaded.');
-            e.preventDefault(); // Prevent form submission
-        }
-    });
-});
-
-    </script>
