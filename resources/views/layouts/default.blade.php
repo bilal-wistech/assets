@@ -1,4 +1,6 @@
-@php use App\Models\Asset; @endphp
+@php 
+//dd(config('permissions'));
+use App\Models\Asset; @endphp
         <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -834,7 +836,7 @@
                                 </a>
                             </li>
                         @endcanany
-                        @can('incident.view')
+                        @canany(['admin','view'], \App\Models\Fine::class)
                             <li class="treeview{{ (Request::is('fines*') || Request::is('create*') || Request::is('accidents*') || Request::is('create-accident*') || Request::is('accident/*/edit') || Request::is('fine/*/edit') ? ' active' : '') }}">
                                 <a href="#" class="dropdown-toggle">
                                     <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
@@ -843,19 +845,23 @@
                                 </a>
 
                                 <ul class="treeview-menu">
+                                    @can('view', \App\Models\Accident::class)
                                     <li {!! (Request::is('accidents*') || Request::is('create-accident*') || Request::is('accident/*/edit') ? ' class="active"' : '') !!} class="firstnav">
                                         <a href="{{ route('accidents')}}">
                                             <i class="fa fa-car-crash"></i>&nbsp;&nbsp;<span>{{ trans('Accidents') }}</span>
                                         </a>
                                     </li>
+                                    @endcan
+                                    
                                     <li {!! (Request::is('fines*') || Request::is('create') || Request::is('fine/*/edit')? ' class="active"' : '') !!} class="firstnav">
                                         <a href="{{ route('fines')}}">
                                             <i class="fa-solid fa-file-invoice"></i>&nbsp;&nbsp;<span>{{ trans('general.fines') }}</span>
                                         </a>
                                     </li>
+                                    
                                 </ul>
                             </li>
-                        @endcan
+                        @endcanany
                         @canany(['admin', 'towing_requests.view'])
                             <li {!! (Request::is('towing_requests*') ? ' class="active"' : '') !!} class="firstnav">
                                 <a href="{{ route('towing_requests')}}">

@@ -2,57 +2,59 @@
 
 namespace App\Providers;
 
-use App\Models\Accessory;
-use App\Models\Asset;
-use App\Models\AssetAssignment;
-use App\Models\AssetModel;
-use App\Models\Category;
-use App\Models\Company;
-use App\Models\Component;
-use App\Models\Consumable;
-use App\Models\CustomField;
-use App\Models\CustomFieldset;
-use App\Models\Department;
-use App\Models\Depreciation;
+use Carbon\Carbon;
 use App\Models\Fine;
-use App\Models\Insurance;
+use App\Models\User;
+use App\Models\Asset;
+use App\Models\Company;
 use App\Models\License;
+use App\Models\Accident;
+use App\Models\Category;
 use App\Models\Location;
-use App\Models\Manufacturer;
-use App\Models\PredefinedKit;
-use App\Models\Statuslabel;
 use App\Models\Supplier;
+use App\Models\Accessory;
+use App\Models\Component;
+use App\Models\Insurance;
+use App\Models\AssetModel;
+use App\Models\Consumable;
+use App\Models\Department;
+use App\Models\CustomField;
+use App\Models\Statuslabel;
+use App\Models\Depreciation;
+use App\Models\Manufacturer;
+use App\Policies\FinePolicy;
+use App\Policies\UserPolicy;
+use App\Models\PredefinedKit;
 use App\Models\TowingRequest;
 use App\Models\TypeOfExpence;
-use App\Models\User;
-use App\Policies\AccessoryPolicy;
-use App\Policies\AssetAssignmentPolicy;
-use App\Policies\AssetInsurancePolicy;
-use App\Policies\AssetModelPolicy;
 use App\Policies\AssetPolicy;
-use App\Policies\CategoryPolicy;
-use App\Policies\CompanyPolicy;
-use App\Policies\ComponentPolicy;
-use App\Policies\ConsumablePolicy;
-use App\Policies\CustomFieldPolicy;
-use App\Policies\CustomFieldsetPolicy;
-use App\Policies\DepartmentPolicy;
-use App\Policies\DepreciationPolicy;
-use App\Policies\FinePolicy;
-use App\Policies\LicensePolicy;
-use App\Policies\LocationPolicy;
-use App\Policies\ManufacturerPolicy;
-use App\Policies\PredefinedKitPolicy;
-use App\Policies\ReExpencePolicy;
-use App\Policies\StatuslabelPolicy;
-use App\Policies\SupplierPolicy;
+use App\Models\CustomFieldset;
 use App\Policies\TowingPolicy;
-use App\Policies\TypeOfExpencePolicy;
-use App\Policies\UserPolicy;
-use Carbon\Carbon;
-use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Gate;
 use Laravel\Passport\Passport;
+use App\Models\AssetAssignment;
+use App\Policies\CompanyPolicy;
+use App\Policies\LicensePolicy;
+use App\Policies\AccidentPolicy;
+use App\Policies\CategoryPolicy;
+use App\Policies\LocationPolicy;
+use App\Policies\SupplierPolicy;
+use App\Policies\AccessoryPolicy;
+use App\Policies\ComponentPolicy;
+use App\Policies\ReExpencePolicy;
+use App\Policies\AssetModelPolicy;
+use App\Policies\ConsumablePolicy;
+use App\Policies\DepartmentPolicy;
+use App\Policies\CustomFieldPolicy;
+use App\Policies\StatuslabelPolicy;
+use App\Policies\DepreciationPolicy;
+use App\Policies\ManufacturerPolicy;
+use Illuminate\Support\Facades\Gate;
+use App\Policies\PredefinedKitPolicy;
+use App\Policies\TypeOfExpencePolicy;
+use App\Policies\AssetInsurancePolicy;
+use App\Policies\CustomFieldsetPolicy;
+use App\Policies\AssetAssignmentPolicy;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -86,6 +88,7 @@ class AuthServiceProvider extends ServiceProvider
         Insurance::class => AssetInsurancePolicy::class,
         TypeOfExpence::class => TypeOfExpencePolicy::class,
         Fine::class => FinePolicy::class,
+        Accident::class => AccidentPolicy::class,
         TowingRequest::class => TowingPolicy::class,
     ];
 
@@ -176,6 +179,17 @@ class AuthServiceProvider extends ServiceProvider
         // access for the Towing Request
         Gate::define('towing_requests.view', function ($user) {
             if ($user->hasAccess('towing_requests.view')) {
+                return true;
+            }
+        });
+        // access for the Fines
+        Gate::define('fines', function ($user) {
+            if ($user->hasAccess('fines')) {
+                return true;
+            }
+        });
+        Gate::define('accidents', function ($user) {
+            if ($user->hasAccess('accidents')) {
                 return true;
             }
         });

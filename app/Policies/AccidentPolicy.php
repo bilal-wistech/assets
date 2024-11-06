@@ -4,11 +4,10 @@ namespace App\Policies;
 
 use App\Policies\SnipePermissionsPolicy;
 
-class TowingPolicy extends SnipePermissionsPolicy
+class AccidentPolicy extends SnipePermissionsPolicy
 {
     protected function columnName()
     {
-        return 'towing_requests';
+        return 'accidents';
     }
-    
 }
