@@ -52,7 +52,7 @@ class REgridController extends Controller
 
     {
        
-        $this->authorize('view', AddExpence::class);
+        //$this->authorize('view', AddExpence::class);
         $users = User::all();
         return view('layouts/regrid/show')->with('users', $users);
         
