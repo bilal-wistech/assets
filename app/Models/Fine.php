@@ -24,7 +24,8 @@ class Fine extends Model
         'location',
         'note',
         'fine_image',
-        'fine_number'
+        'fine_number',
+        'notification',
       
     ];
 

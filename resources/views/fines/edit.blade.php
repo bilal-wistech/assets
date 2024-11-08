@@ -6,12 +6,12 @@
 
 {{-- Page title --}}
 @section('title')
-@if (Request::is('create'))
-{{ trans('general.add_fine') }}
+    @if (Request::is('create'))
+        {{ trans('general.add_fine') }}
     @else
-    Edit Fine
+        Edit Fine
     @endif
-    
+
     @parent
 @stop
 
@@ -105,11 +105,13 @@
         <div class="col-md-9">
             <div class="box box-default">
                 <div class="box-header with-border">
-                    <!-- <h2 class="box-title">@if (Request::is('create'))
-{{ trans('general.add_fine') }}
-    @else
+                    <!-- <h2 class="box-title">
+        @if (Request::is('create'))
+    {{ trans('general.add_fine') }}
+@else
     Edit Fine
-    @endif </h2> -->
+    @endif
+        </h2> -->
                 </div><!-- /.box-header -->
                 <div class="box-body">
                     <div class="col-md-12">
@@ -150,7 +152,18 @@
                                 <label for="asset_id"
                                     class="col-md-3 control-label">{{ trans('general.asset_id') }}</label>
                                 <div class="col-md-7">
-                                    {{ Form::select('asset_id', isset($fine) ? [$fine->asset->name] + $assets : ['' => 'Select'] + $assets, isset($fine) ? $fine->asset->id : null, ['class' => 'form-control  select2', 'id' => 'asset_id', 'required']) }}
+                                    <select name="asset_id" id="asset_id" class="form-control select2" required>
+                                        <option value="">Select</option>
+                                        @foreach ($assets as $asset)
+                                            <option value="{{ $asset['id'] }}"
+                                                {{ isset($fine) && $fine->asset && $fine->asset->id == $asset['id'] ? 'selected' : '' }}>
+                                                {{ $asset['asset_tag'] }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    
+
+                                    {{-- {{ Form::select('asset_id', isset($fine) ? [$fine->asset->name] + $assets : ['' => 'Select'] + $assets, isset($fine) ? $fine->asset->id : null, ['class' => 'form-control  select2', 'id' => 'asset_id', 'required']) }} --}}
                                 </div>
                             </div>
                             <!-- Users -->
@@ -323,7 +336,7 @@
                                         {!! $errors->first(
                                             'note',
                                             '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times"
-                                                                                                                                                                                                                                                                                                                                        aria-hidden="true"></i> :message</span>',
+                                                                                                                                                                                                                                                                                                                                                                                                                        aria-hidden="true"></i> :message</span>',
                                         ) !!}
                                     </div>
                                 </div>
@@ -335,7 +348,7 @@
                                         {!! $errors->first(
                                             'note',
                                             '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times"
-                                                                                                                                                                                                                                                                                                                                        aria-hidden="true"></i> :message</span>',
+                                                                                                                                                                                                                                                                                                                                                                                                                        aria-hidden="true"></i> :message</span>',
                                         ) !!}
                                     </div>
                                 </div>

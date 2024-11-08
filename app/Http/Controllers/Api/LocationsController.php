@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 use Exception;
+use App\Models\Fine;
 use App\Models\User;
 use App\Helpers\Helper;
 use App\Models\Location;
@@ -27,6 +28,88 @@ class LocationsController extends Controller
      * @since [v4.0]
      * @return \Illuminate\Http\Response
      */
+
+
+     public function updateFines(Request $request)
+     {
+         $fine_id = $request->input('fine_id');
+         
+         if (!$fine_id) {
+             return response()->json([
+                 'status' => 'error',
+                 'message' => 'Fine ID is required.',
+             ], 400);
+         }
+     
+         try {
+             $fine = Fine::where('id', $fine_id)->first();
+             if (!$fine) {
+                 return response()->json([
+                     'status' => 'error',
+                     'message' => 'No fines found against this fine_id.',
+                 ], 404);
+             }
+     
+             // Update the fine record
+             $updated = Fine::where('id', $fine_id)->update(['recieved_by_user' => 1]);
+     
+             if (!$updated) {
+                 return response()->json([
+                     'status' => 'error',
+                     'message' => 'No fines were updated, please check the database.',
+                 ], 404);
+             }
+     
+             return response()->json([
+                 'status' => 'success',
+                 'message' => 'Notification Received By User Successfully!',
+             ]);
+         } catch (\Exception $e) {
+             return response()->json([
+                 'status' => 'error',
+                 'message' => 'An unexpected error occurred.',
+                 'details' => $e->getMessage(),
+             ], 500);
+         }
+     }
+     
+     
+    public function getUserFines(Request $request)
+    {
+        $user_id = $request->input('user_id');
+
+        // Check if user_id is provided
+        if (!$user_id) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'User ID is required.',
+            ], 400);
+        }
+
+        // Retrieve fines for the specified user_id with notification set to 1
+        $fines = DB::table('fines as f')
+        ->leftJoin('fine_types as ft', 'f.fine_type', '=', 'ft.id')
+        ->leftJoin('assets as a', 'f.asset_id', '=', 'a.id')
+        ->leftJoin('locations as l', 'f.location', '=', 'l.id')
+        ->select('f.*', 'ft.name as fine_type_name', 'a.asset_tag as asset_name', 'l.name as location_name')
+        ->where('f.user_id', $user_id)
+        ->where('f.notification', 1)
+        ->get();
+
+        // Check if any fines are found
+        if ($fines->isEmpty()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No notification found.',
+            ], 404);
+        }
+
+        // Return the fines if found
+        return response()->json([
+            'status' => 'success',
+            'data' => $fines,
+        ]);
+    }
 
  public function updateProfile(Request $request, $id)
     {
