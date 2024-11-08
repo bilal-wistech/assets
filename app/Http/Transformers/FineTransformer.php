@@ -30,7 +30,12 @@ class FineTransformer
             $array = [
                 'id' => $fine->id,
                 'fine_number' => $fine->fine_number ? $fine->fine_number : '',
-                'asset_name' => $result = $fine->asset->name ?? $fine->asset->asset_tag ?? '',
+                'asset_name' => $fine && $fine->asset
+    ? "<a href=\"http://project_assets.test/hardware/{$fine->asset->id}\">" . ($fine->asset->name ?? $fine->asset->asset_tag ?? '') . "</a>"
+    : ($fine->asset->name ?? $fine->asset->asset_tag ?? ''),
+
+
+                
                 'username' => $fine->user != null ? $fine->user->username : 'Username is not available',
                 'fine_type' => $fine->type && $fine->type->name != null ? $fine->type->name : 'not available',
                 'amount' => $fine->amount,

@@ -28,7 +28,7 @@ class FinePresenter extends Presenter
                 'sortable' => true,
                 'title' => 'Fine Number',
                 'visible' => true,
-               
+
             ],
             [
                 'field' => 'asset_name',
@@ -44,7 +44,7 @@ class FinePresenter extends Presenter
                 'sortable' => true,
                 'title' => trans('general.username'),
                 'visible' => true,
-               
+
             ],
 
             [
@@ -53,7 +53,7 @@ class FinePresenter extends Presenter
                 'sortable' => true,
                 'title' => trans('general.title'),
                 'visible' => true,
-               
+
             ],
             [
                 'field' => 'amount',
@@ -61,7 +61,7 @@ class FinePresenter extends Presenter
                 'sortable' => true,
                 'title' => trans('general.amount'),
                 'visible' => true,
-            ], 
+            ],
             [
                 'field' => 'fine_date',
                 'searchable' => true,
@@ -76,26 +76,27 @@ class FinePresenter extends Presenter
                 'sortable' => false,
                 'switchable' => false,
                 'title' => 'Recieved by user',
-		
+
             ],
-            
-             [
+
+            [
                 'field' => 'created_at',
                 'searchable' => true,
                 'sortable' => true,
                 'visible' => true,
                 'title' => trans('general.created_at'),
                 'formatter' => 'dateDisplayFormatter',
-            ], [
+            ],
+            [
                 'field' => 'action',
                 'searchable' => false,
                 'sortable' => false,
                 'switchable' => false,
                 'title' => trans('table.actions'),
-		      'formatter' => 'fineActionsFormatter',
+                'formatter' => 'fineActionsFormatter',
             ],
-           
-        
+
+
         ];
 
         return json_encode($layout);
@@ -105,11 +106,11 @@ class FinePresenter extends Presenter
      * Link to this categories name
      * @return string
      */
-   
+
 
     /**
      * Url to view this item.
      * @return string
      */
-   
+
 }

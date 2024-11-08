@@ -53,7 +53,7 @@ class FineController extends Controller
      */
     public function store(Request $request)
     {
-
+        //dd($request->all());
         $data = $request->all();
         // dd($request->fine_type->fine);
         if ($request->file('fine_image')) {
@@ -76,7 +76,9 @@ class FineController extends Controller
         }
 
         $fine = Fine::create($data);
+
         $detail = Fine::latest()->first();
+        $detail->update(['notification' => 1]);
         //   dd($detail->user_id);
 
         $type_name = $detail->type && $detail->type->name != null ? $detail->type->name : 'not available';
@@ -144,12 +146,18 @@ class FineController extends Controller
      */
     public function edit($id)
     {
-
         $this->authorize('update', Fine::class);
         $fine = Fine::find($id);
-        $assets = Asset::all()->map(function ($asset) {
-            return $asset->name . ' ' . $asset->asset_tag;
-        })->toArray();
+
+        // $assets = Asset::all()->map(function ($asset) {
+        //     // return $asset->name . ' ' . $asset->asset_tag;
+        //     return $asset->asset_tag;
+        // })->toArray();
+
+        $assets = Asset::all()->toArray();
+
+
+
         $users = User::all()->pluck('username', 'id')->toArray();
         $fine_type = FineType::all()->pluck('name', 'id')->toArray();
         $location = Location::all()->pluck('name', 'id')->toArray();
