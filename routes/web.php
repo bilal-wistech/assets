@@ -53,6 +53,8 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::post('/notifications/update', [InsuranceController::class, 'updatenotification'])->name('notifications.update');
     Route::post('/approve-towing-request', [InsuranceController::class, 'updateFailedTowing']);
+    Route::post('insurance/toggleAllDrivers', [InsuranceController::class, 'toggleAllDrivers']);
+
 
 
     //fine
