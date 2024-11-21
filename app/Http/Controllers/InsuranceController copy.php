@@ -97,12 +97,13 @@ class InsuranceController extends Controller
         $item = new Insurance;
         $item->insurance_date = date('Y-m-d');
         $user = User::all();
-
+        $toggle_value = DB::table('assets')->where('id', $item->asset_id)->value('toggle');
 
         return view('insurance/edit')->with('item', new Insurance)
         ->with('assets', Helper::getAssetsArr())
         ->with('suppliers', Helper::getSuppliersArr())
-        ->with('user', $user);
+        ->with('user', $user)
+        ->with('toggle_value', $toggle_value);
     }
 
     /**
@@ -112,45 +113,35 @@ class InsuranceController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-{
-    $all_drivers_toggle = $request->input('toggle_value');
-    $time = date("H:i:s");
-    
-    // Create the Insurance record
-    $model = new Insurance;
-    $model->asset_id = $request->asset_id;
-    $model->vendor_id = $request->vendor_id;
-    $model->recovery_number = $request->recovery_number;
-    $model->towingsavailable = $request->towingsavailable;
-    $model->insurance_date = $request->insurance_date . " " . $time;
-    $model->insurance_from = $request->insurance_from . " " . $time;
-    $model->insurance_to = $request->insurance_to;
-    $model->amount = $request->amount;
-    $model->premium_type = $request->premium_type;
-    $model->cost = $request->cost;
-    $model->no_of_drivers_allowed = $request->no_of_drivers_allowed;
-    $model->driver_cost = $request->driver_cost;
-    
-    if ($model->save()) {
-        if ($all_drivers_toggle == "1") {
-            $model->toggle = "1";  
-        } elseif ($all_drivers_toggle == "0") {
-            $model->toggle = null;  
+    {
+       //dd($request->all());
+        $time = date("H:i:s");
+        $model = new Insurance;
+        $model->asset_id = $request->asset_id;
+        $model->vendor_id = $request->vendor_id;
+        $model->recovery_number = $request->recovery_number;
+        $model->towingsavailable = $request->towingsavailable;
+        $model->insurance_date = $request->insurance_date." ".$time;
+        $model->insurance_from = $request->insurance_from." ".$time;
+        $model->insurance_to = $request->insurance_to;
+        $model->amount = $request->amount;
+        $model->premium_type = $request->premium_type;
+        $model->cost = $request->cost;
+        $model->no_of_drivers_allowed = $request->no_of_drivers_allowed;
+        $model->driver_cost = $request->driver_cost;
+        if($model->save()){
+            if(isset($request->drivers) && $request->drivers<>null){
+                // dd($request->drivers);
+                foreach($request->drivers as $key=>$driver){
+                    $child = new AllowedDrivers;
+                    $child->insurance_id = $model->id;
+                    $child->driver_name = $driver['name'];
+                    $child->save();
+                }
+            } 
+            return redirect()->route('insurance.index')->with('success', trans('admin/insurance/message.create.success'));
         }
-        $model->save(); 
-        if (isset($request->drivers) && $request->drivers !== null) {
-            foreach ($request->drivers as $driver) {
-                $child = new AllowedDrivers;
-                $child->insurance_id = $model->id;
-                $child->driver_name = $driver['name'];
-                $child->save();
-            }
-        }
-        
-        return redirect()->route('insurance.index')->with('success', trans('admin/insurance/message.create.success'));
     }
-}
-
 
     /**
      * Display the specified resource.
@@ -172,15 +163,15 @@ class InsuranceController extends Controller
     public function edit($insurance_id = null)
     {
         $this->authorize('update', Insurance::class);
-
+       
         if (is_null($item = Insurance::find($insurance_id))) {
             return redirect()->route('insurance.index')->with('error', trans('admin/insurance/message.does_not_exist'));
         }
-
+        $toggle_value = DB::table('assets')->where('id', $item->asset_id)->value('toggle');
         $user = User::all();
-        //dd($user);
+        //dd($toggle_value);
 
-        return view('insurance/edit', compact('item' , 'user'))
+        return view('insurance/edit', compact('item' , 'user','toggle_value'))
         ->with('assets', Helper::getAssetsArr())
         ->with('suppliers', Helper::getSuppliersArr());
     }
@@ -195,14 +186,12 @@ class InsuranceController extends Controller
     public function update(Request $request, $insurance_id = null)
     {
         //dd($request->all());
-        $all_drivers_toggle = $request->input('toggle_value');
-        
         if (is_null($model = Insurance::find($insurance_id))) {
             // Redirect to the insurance management page
             return redirect()->route('insurance.index')->with('error', trans('admin/insurance/message.does_not_exist'));
         }
-//dd($insurance_id);
-        //($model);
+
+        //dd('hello');
 
         $time = date("H:i:s");
         $model->asset_id = $request->asset_id;
@@ -228,20 +217,10 @@ class InsuranceController extends Controller
                     $child->driver_name = $driver['name'];
                     $child->save();
                 }
-                if ($all_drivers_toggle == "1") {
-                    //dd("ok");
-                        Insurance::where('id', $request->insurance_id)
-                        ->update(['toggle' => $all_drivers_toggle]);
-                    } elseif ($all_drivers_toggle == "0") {
-                        //dd("not ok");
-                        Insurance::where('id', $request->insurance_id)
-                            ->update(['toggle' => null]);
-                    }
             }
             
             return redirect()->route('insurance.index')->with('success', trans('admin/insurance/message.create.success'));
         }
-        
     }
 
     /**
@@ -275,26 +254,13 @@ class InsuranceController extends Controller
 
     public function toggleAllDrivers(Request $request)
 {
-    // Define the group IDs
-    $group_id = [2, 3];
-
-    // Retrieve all driver IDs for the specified groups
-    $all_drivers = User::join('users_groups', 'users.id', '=', 'users_groups.user_id')
-        ->whereIn('users_groups.group_id', $group_id)
-        ->pluck('users.id')
-        ->toArray();
-
-    // Get the insurance ID and toggle value from the request
-    $insurance_id = $request->input('insurance_id');
+    $asset_id = $request->input('asset_id');
     $all_drivers_toggle = $request->input('all_drivers_toggle');
-    
-    // If toggle is set to "1", add all drivers as AllowedDrivers
     if ($all_drivers_toggle == "1") {
-        
-        Insurance::where('id', $insurance_id)
+        Asset::where('id', $asset_id)
         ->update(['toggle' => $all_drivers_toggle]);
     } elseif ($all_drivers_toggle == "0") {
-        Insurance::where('id', $insurance_id)
+        Asset::where('id', $asset_id)
             ->update(['toggle' => null]);
     }
     return response()->json(['status' => 'success', 'toggle' => $all_drivers_toggle,'success' => 'All driver assigned successfully']);

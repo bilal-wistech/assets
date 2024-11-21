@@ -77,14 +77,16 @@
                     <div class="form-group ">
                         <label for="user_id" class="col-md-3 control-label">{{ trans('general.user') }}</label>
                         <div class="col-md-8 col-sm-12">
-                            @if ($insurance->toggle==1)
+                            @if ($item->toggle==1)
                             <select name="user_id" id="driver_id" class="form-control select2" required>
-                                @foreach ($all_drivers_list as $id => $user)
-                                    <option value="{{ $id }}" {{ $item->user_id == $id ? 'selected' : '' }}>
-                                        {{ $user['first_name'] }} {{ $user['last_name'] }}
+                                
+                                {{-- @foreach ($all_drivers_list as $id => $username) --}}
+                                @foreach ($all_drivers_list as $driver)
+
+                                    <option value="{{ $driver->user_id }}">
+                                        {{ $driver->username }}
                                     </option>
                                 @endforeach
-
                             </select>
                             @else
                             {{ Form::select('user_id', [] ,$item->user_id, ['id' => 'assigned_user', 'class' => 'form-control userSearchable serchable', 'required']) }}   

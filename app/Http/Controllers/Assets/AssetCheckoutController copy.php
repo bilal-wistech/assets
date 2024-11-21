@@ -58,20 +58,10 @@ class AssetCheckoutController extends Controller
 
     $group_id = [2, 3];
     $all_drivers_list = User::join('users_groups', 'users.id', '=', 'users_groups.user_id')
-    ->whereIn('users_groups.group_id', $group_id)
-    ->select('users.id', 'users.username', 'users.first_name', 'users.last_name')
-    ->get()
-    ->keyBy('id')
-    ->map(function ($user) {
-        return [
-            'username' => $user->username,
-            'first_name' => $user->first_name,
-            'last_name' => $user->last_name
-        ];
-    })
-    ->toArray();
-
-//dd($all_drivers_list);
+        ->whereIn('users_groups.group_id', $group_id)
+        ->select('users.username as username', 'users.id as user_id')->get();
+        //->toArray();
+// dd($all_drivers_list[0]);
     $item = $asset;
     if (!empty($item->id)) {
         $insurance = DB::table('insurance')->where('asset_id', $item->id)->first();
