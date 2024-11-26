@@ -8,7 +8,7 @@
 
 
 @section('header_right')
-    @can('create', \App\Models\Fine::class)
+    @can('create', \App\Models\Accident::class)
         <a href="{{ route('accidents.create') }}" class="btn btn-primary pull-right">
             {{ trans('general.create') }}</a>
     @endcan
